@@ -2,7 +2,7 @@
 # .RECIPEPREFIX = "    "
 
 
-.PHONY: gitgraph dist tests pip
+.PHONY: gitgraph dist tests pip docs
 
 all: clean tests
 
