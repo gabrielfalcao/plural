@@ -106,19 +106,14 @@ def test_(context):
         u'Document/objects/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
     ])
     store.delete(docs2)
+    store.commit()
     list_file_tree(store.path).should.equal([
-        'Document/_ids/1c3b00da1c3b00da1c3b00da1c3b00da'
-        'Document/_ids/deadbeefdeadbeefdeadbeefdeadbeef'
-        'Document/_uuids/7fab47d1e50cfe3682a12acfce2f5208d619d5f6'
-        'Document/_uuids/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
-        'Document/indexes/content/7fab47d1e50cfe3682a12acfce2f5208d619d5f6'
-        'Document/indexes/content/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
-        'Document/indexes/title/7fab47d1e50cfe3682a12acfce2f5208d619d5f6'
-        'Document/indexes/title/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
-        'Document/indexes/uuid/7fab47d1e50cfe3682a12acfce2f5208d619d5f6'
-        'Document/indexes/uuid/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
-        'Document/objects/7fab47d1e50cfe3682a12acfce2f5208d619d5f6'
-        'Document/objects/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
+        u'Document/_ids/deadbeefdeadbeefdeadbeefdeadbeef',
+        u'Document/_uuids/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
+        u'Document/indexes/content/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
+        u'Document/indexes/title/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
+        u'Document/indexes/uuid/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
+        u'Document/objects/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
     ])
 
 
