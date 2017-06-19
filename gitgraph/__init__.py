@@ -76,6 +76,7 @@ class GitGraphStore(object):
         predicate_ids = []
 
         self.add_spo(os.path.join(subject, '_ids'), subject_uuid, object_hash)
+        self.add_spo(os.path.join(subject, '_uuids'), object_hash, subject_uuid)
 
         indexes = {}
         for key in obj.keys():
@@ -119,7 +120,7 @@ class GitGraphStore(object):
     def delete(self, *nodes):
         for node in nodes:
             for path, oid in self.trace_path(self.glob('*{}*'.format(node.uuid))):
-                self.repository.index.remove(path)
+                map(self.repository.index.remove, node.get_related_blob_paths())
                 self.queries.append(
                     ' '.join(map(bytes, ['DELETE', node]))
                 )
@@ -225,6 +226,20 @@ class Subject(Node):
     def from_data(cls, name, **kw):
         Definition = cls.definition(name)
         return Definition(**kw)
+
+    def get_related_blob_paths(self):
+        subject_name = self.__class__.__name__
+        uuid = self.uuid
+        blob_id_path = '{subject_name}/_ids/{uuid}'.format(**locals())
+        blob_id = self.repository[self.repository.index[blob_id_path].oid].data
+        paths = {
+            '{subject_name}/_ids/{uuid}',
+            '{subject_name}/_uuids/{blob_id}',
+            '{subject_name}/indexes/uuid/{blob_id}',
+            '{subject_name}/objects/{blob_id}',
+        }
+        paths = paths.union({'{subject_name}/indexes/{predicate}/{blob_id}'.format(**locals()) for predicate in self.indexes})
+        return map(lambda path: path.format(**locals()), paths)
 
     def __hash__(self):
         return int(sha256(self.to_json()).hexdigest(), 16)
