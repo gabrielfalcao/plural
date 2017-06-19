@@ -1,7 +1,7 @@
 GitGraph - A git-backed graph database
 ======================================
 
-This is an experimental projects with idea taken from the `hexastore
+This is an experimental project with idea taken from the `hexastore
 <http://www.vldb.org/pvldb/1/1453965.pdf>`_ paper.
 
 Basic Axioms:
