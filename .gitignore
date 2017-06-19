@@ -1,0 +1,14 @@
+*.py[cod]
+.coverage
+*flymake*
+*#*
+.*#*
+*.#*
+.*.#*
+*.egg*
+nohup.out
+deps/
+dist/*.gz
+docs/build
+dist/
+tests/*/sandbox
