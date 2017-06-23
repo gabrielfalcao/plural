@@ -100,6 +100,8 @@ Basic Axioms:
 - The *uuid4* of an **Object** can be retrieved at ``SubjectName/_uuids/:blob_id``
 - Indexed predicates are stored in the tree with the path: ``SubjectName/indexes/<index name>/:blob_id``
 
+You can `visualize <https://github.com/gabrielfalcao/gitgraph/blob/master/tests/functional/test_file_structure.py>`_ what the final file-tree `looks like <https://github.com/gabrielfalcao/gitgraph/blob/master/tests/functional/test_file_structure.py>`_ in the `file-structure functional tests <https://github.com/gabrielfalcao/gitgraph/blob/master/tests/functional/test_file_structure.py#L94>`_.
+
 Supported Operations
 --------------------
 
