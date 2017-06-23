@@ -33,7 +33,7 @@ Usage:
     uuid1 = 'deadbeefdeadbeefdeadbeefdeadbeef'
     uuid2 = '1c3b00da1c3b00da1c3b00da1c3b00da'
 
-    # Subject can be created
+    # create a couple of "Document" subjects
     docs1 = store.create(
         'Document',
         uuid=uuid1,
@@ -50,32 +50,52 @@ Usage:
     store.commit()
     store.delete(docs1)
     store.commit()
+
+    # create or update existing by matching indexes + id
     store.merge(docs1, docs2)
+
+    # recreate the doc1
     docs1 = store.create(
-        'Document',
+        Document,
         uuid=uuid1,
         title='Essay',
         body='body1',
     )
-    docs2 = store.create(
-        'Document',
-        uuid=uuid2,
-        title='Blog',
-        body='body2',
+
+    # create doc3 with a auto-generated uuid
+    docs3 = store.create(
+        Document,
+        title='Automated',
+        body='body1',
     )
-    store.commit()
+    uuid3 = docs3.uuid
 
     docs11 = store.get_subject_by_uuid('Document', uuid1)
     docs22 = store.get_subject_by_uuid(Document, uuid2)
+    docs33 = store.get_subject_by_uuid(Document, uuid3)
     assert docs1 == docs11
     assert docs2 == docs22
+    assert docs3 == docs33
 
-    blog_documents = set(store.match_subjects_by_index('Document', 'title', lambda title: 'Blog' in title))
-    assert len(blog_documents) == 2
+    store.delete(docs3)
+
+    blog_documents = set(store.match_subjects_by_index(Document, 'title', lambda title: 'Blog' in title))
+    essays_and_posts_documents = set(store.match_subjects_by_index(Document, 'title', lambda title: 'Blog' in title or 'Essay' in title ))
+    assert len(blog_documents) == 1
+    assert len(essays_and_documents) == 2
     assert docs1 in blog_documents
-    assert docs2 in blog_documents
     assert docs11 in blog_documents
-    assert docs22 in blog_documents
+
+    assert docs2 not in blog_documents
+    assert docs22 not in blog_documents
+
+    assert docs1 in essays_and_posts_documents
+    assert docs2 in essays_and_posts_documents
+    assert docs3 in essays_and_posts_documents
+
+    assert docs11 in essays_and_posts_documents
+    assert docs22 in essays_and_posts_documents
+    assert docs33 in essays_and_posts_documents
 
     assert not set(store.scan_all('Document')).difference({blog1, blog2}}
     assert not set(store.scan_all(Document)).difference({blog11, blog22}}
