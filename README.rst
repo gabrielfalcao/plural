@@ -149,9 +149,7 @@ TODO:
 - Merge strategies *(git flow?)*
 - Use git-hooks for real time notifications
 
-
-Related GraphQL Links
-~~~~~~~~~~~~~~~~~~~~~
+**Related GraphQL Links** for further design and implementation
 
 - `Nodes <http://docs.graphene-python.org/en/latest/types/objecttypes/>`_
 - `Edges <http://docs.graphene-python.org/en/latest/relay/connection/>`_
