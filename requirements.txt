@@ -1,2 +1,5 @@
 pygit2==0.25.1
 python-dateutil==2.6.0
+graphene==1.4
+agentzero==0.3.3
+gevent==1.2.2
