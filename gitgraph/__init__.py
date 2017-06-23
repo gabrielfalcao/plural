@@ -261,3 +261,7 @@ class Subject(Node):
 
     def __eq__(self, other):
         return isinstance(other, Subject) and self.to_dict() == other.to_dict()
+
+
+class GitGraph(GitGraphStore):
+    pass

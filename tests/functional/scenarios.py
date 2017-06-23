@@ -2,7 +2,7 @@
 import os
 import shutil
 from plant import Node
-from gitgraph import GitGraphStore
+from gitgraph import GitGraph
 
 from sure import scenario
 
@@ -16,7 +16,7 @@ def with_hexastore(name):
 
     def create_store(context):
         context.store_path = sandbox.join(name)
-        context.store = GitGraphStore(os.path.relpath(context.store_path))
+        context.store = GitGraph(os.path.relpath(context.store_path))
 
     def destroy_store(context):
         if os.path.isdir(context.store_path):
