@@ -19,7 +19,7 @@ class Author(Subject):
 
 
 class Document(Subject):
-    indexes = {'title'}
+    indexes = {'title', 'content'}
     fields = (
         ('title', codec.Unicode),
         ('body', codec.Unicode),
