@@ -1,0 +1,1 @@
+mutation myFirstMutation { createPerson(name:"Peter") { person { name } ok }}

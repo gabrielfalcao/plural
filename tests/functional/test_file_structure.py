@@ -2,7 +2,7 @@
 
 from gitgraph import Subject
 from gitgraph import codec
-
+from sure import anything
 from tests.functional.helpers import list_file_tree
 from tests.functional.scenarios import with_hexastore
 
@@ -20,13 +20,9 @@ class Author(Subject):
 
 class Document(Subject):
     indexes = {'title', 'content'}
-    fields = (
-        ('title', codec.Unicode),
-        ('body', codec.Unicode),
-        ('created_at', codec.DateTime),
-        ('published_at', codec.DateTime),
-    )
-
+    fields = {
+        'title': codec.Unicode,
+    }
     incoming = {
         'authored_by': Author,
     }
@@ -36,7 +32,7 @@ class Document(Subject):
 
 
 @with_hexastore('cms')
-def test_(context):
+def test_create_subject(context):
     store = context.store
 
     uuid1 = 'deadbeefdeadbeefdeadbeefdeadbeef'
@@ -57,6 +53,7 @@ def test_(context):
     )
 
     store.commit()
+
     store.delete(docs1)
     store.commit()
     store.merge(docs1, docs2)

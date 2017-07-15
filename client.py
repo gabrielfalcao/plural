@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#
 # <GitGraph - Git-powered database>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
@@ -16,39 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from decimal import Decimal
-from dateutil.parser import parse as parse_datetime
+import logging
+import zmq.green as zmq
+from agentzero.core import SocketManager
+
+logger = logging.getLogger('server')
 
 
-class Codec(object):
-    def decode(self, string):
-        raise NotImplementedError
+class GraphClient(object):
+    def __init__(self, request_connect_addr='tcp://127.0.0.1:6000'):
+        self.context = zmq.Context()
+        self.sockets = SocketManager(zmq, self.context)
+        self.sockets.create('query', zmq.REQ)
 
-    def encode(self, string):
-        raise NotImplementedError
-
-
-class Unicode(Codec):
-    encoding = 'utf-8'
-
-    def encode(self, string):
-        return string.encode(self.encoding)
-
-    def decode(self, string):
-        return string.decode(self.encoding)
-
-
-class DateTime(Codec):
-    def encode(self, datetime):
-        return datetime.isoformat()
-
-    def decode(self, string):
-        return parse_datetime(string)
-
-
-class Number(Codec):
-    def encode(self, number):
-        return bytes(number)
-
-    def decode(self, string):
-        return Decimal(string)
+    def request(self, data):
+        self.sockets.send_safe('query', data)
+        return self.sockets.recv_safe('query')

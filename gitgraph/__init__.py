@@ -1,11 +1,28 @@
 # -*- coding: utf-8 -*-
+#
+# <GitGraph - Git-powered database>
+# Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 import json
 import socket
 import pygit2
 from hashlib import sha256
 from uuid import uuid4
-
+from datetime import datetime
 from fnmatch import fnmatch
 from collections import OrderedDict
 
@@ -30,6 +47,7 @@ def resolve_subject_name(subj):
         )
         raise TypeError(msg.format(repr(subj)))
 
+
 def resolve_subject(subj):
     if isinstance(subj, type) and issubclass(subj, Subject):
         return subj.__name__
@@ -41,6 +59,22 @@ def resolve_subject(subj):
             'a string. Got {}'
         )
         raise TypeError(msg.format(repr(subj)))
+
+
+def serialize_commit(commit):
+    data = {
+        'author': {
+            'name': commit.author.name,
+            'email': commit.author.email,
+        },
+        'committer': {
+            'name': commit.committer.name,
+            'email': commit.committer.email,
+        },
+        'message': commit.message,
+        'date': datetime.utcfromtimestamp(commit.commit_time),
+    }
+    return data
 
 
 class GitGraphStore(object):
@@ -58,6 +92,14 @@ class GitGraphStore(object):
 
     def deserialize(self, string):
         return json.loads(string)
+
+    def iter_versions(self, branch='master'):
+        for commit in self.repository.walk(self.repository.head.target, pygit2.GIT_SORT_TOPOLOGICAL):
+            yield serialize_commit(commit)
+
+    def get_versions(self, branch='master'):
+        results = list(self.iter_versions(branch))
+        return results
 
     def add_spo(self, subject, predicate, data):
         blob_id = self.repository.create_blob(data)
@@ -133,7 +175,6 @@ class GitGraphStore(object):
             blob = self.repository[subject_blob_id]
             return Subject.from_data(subject_name, **self.deserialize(blob.data))
 
-
     def match_subjects_by_index(self, subject_name, field_name, match_callback):
         subject_name = resolve_subject_name(subject_name)
         pattern = os.sep.join([subject_name or '*', 'indexes', '*'])
@@ -178,6 +219,10 @@ SUBJECTS = OrderedDict()
 SUBJECTS_BY_CLASS = OrderedDict()
 
 
+class InvalidSubjectDefinition(Exception):
+    pass
+
+
 def subject_has_index(name, key):
     if name not in SUBJECTS:
         return False
@@ -186,11 +231,24 @@ def subject_has_index(name, key):
     return subject.indexes.intersection({key})
 
 
+def get_attribute_from_meta_child(attribute, cls, members):
+    return getattr(cls, attribute, members.get(attribute))
+
+
+def validate_subject_definition(name, cls, members):
+    indexes = get_attribute_from_meta_child('indexes', cls, members)
+    if not indexes:
+        raise InvalidSubjectDefinition('the {} definition should have at least one index'.format(cls))
+    # if not isinstance(indexes, (set, list, tuple)):
+    #     raise InvalidSubjectDefinition('')
+
+
 class MetaSubject(type):
     def __init__(cls, name, bases, members):
         if name not in ('MetaSubject', 'Subject') and cls.__module__ != __name__:
             SUBJECTS[name] = cls
             SUBJECTS_BY_CLASS[cls] = name
+            validate_subject_definition(name, cls, members)
 
         super(MetaSubject, cls).__init__(name, bases, members)
 
@@ -260,7 +318,7 @@ class Subject(Node):
         return bytes(self)
 
     def __eq__(self, other):
-        return isinstance(other, Subject) and self.to_dict() == other.to_dict()
+        return isinstance(other, Node) and self.to_dict() == other.to_dict()
 
 
 class GitGraph(GitGraphStore):

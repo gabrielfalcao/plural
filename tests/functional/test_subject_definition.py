@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 from gitgraph import Subject
 from gitgraph import SubjectDefinitionNotFound
+from gitgraph import InvalidSubjectDefinition
 
+
+def define_subject_without_indexes():
+    class Post(Subject):
+        pass
 
 def test_subject_definition():
 
@@ -16,3 +21,10 @@ def test_subject_definition():
         }
 
     Subject.definition('Actor').should.equal(Actor)
+
+
+def test_indexes_definition():
+    define_subject_without_indexes.when.called.should.have.raised(
+        InvalidSubjectDefinition,
+        "the <class 'tests.functional.test_subject_definition.Post'> definition should have at least one index"
+    )
