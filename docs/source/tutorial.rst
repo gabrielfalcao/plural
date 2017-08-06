@@ -1,6 +1,12 @@
-GitGraph - A git-backed graph database
-======================================
+.. _Tutorial:
 
+
+.. highlight:: bash
+
+
+
+Basic Usage
+===========
 
 Instalation
 -----------

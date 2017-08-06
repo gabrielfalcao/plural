@@ -7,10 +7,12 @@ Welcome to GitGraph's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
-
+   introduction
+   tutorial
+   api-reference
 
 Indices and tables
 ==================

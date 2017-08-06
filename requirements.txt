@@ -1,6 +1,8 @@
-pygit2==0.25.1
-python-dateutil==2.6.0
-graphene==1.4
 agentzero==0.3.3
+coloredlogs==7.1
 gevent==1.2.2
-coloredlogs==7.0
+graphene==1.4.1
+nose-randomly==1.2.5
+pygit2==0.26.0
+python-dateutil==2.6.1
+rednose==1.2.2

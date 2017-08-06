@@ -78,6 +78,13 @@ def serialize_commit(commit):
 
 
 class GitGraphStore(object):
+    """Data store that manipulates a single git repository
+
+    :param path: ``bytes`` - the path to the git repository ``string``
+    :param bare: ``bool`` - manipulate git objects only
+    :param author_name: ``unicode`` - the name of the default git author, when not provided defaults to ``"hexastore"``
+    :param author_email: ``unicode`` - the email of the default git author, when not provided defaults to ``"hexastore@git"``
+    """
     def __init__(self, path=None, bare=False, author_name='hexastore', author_email='hexastore@git'):
         path = path or self.__class__.__name__.lower()
         self.path = path
@@ -87,27 +94,66 @@ class GitGraphStore(object):
         self.queries = []
         self.default_branch = 'refs/heads/master'
 
+    def add_remote(self, name, url):
+        """adds a remote repository
+
+        :param name: ``bytes``
+        :param url: ``bytes``
+        """
+        self.repository.remotes.create(name, url)
+
     def serialize(self, obj):
+        """serializes an object, meant for internal use only.
+
+        :param obj: a hashable object
+        :return: ``string``
+        """
         return "\n".join([line.rstrip() for line in json.dumps(obj, sort_keys=True, indent=2).split('\n')])
 
     def deserialize(self, string):
+        """deserialize a string into an object, meant for internal use only.
+
+        :param string: a hashable object
+        :return: ``a hashable object``
+        """
         return json.loads(string)
 
     def iter_versions(self, branch='master'):
+        """iterates over all the commits of the repo
+        :param branch: the branch name
+        :return: an iterator of dictionaries with commit metadata
+        """
         for commit in self.repository.walk(self.repository.head.target, pygit2.GIT_SORT_TOPOLOGICAL):
             yield serialize_commit(commit)
 
     def get_versions(self, branch='master'):
+        """same :py:meth:`as iter_versions` but returns a list
+        :return: a list
+        """
         results = list(self.iter_versions(branch))
         return results
 
     def add_spo(self, subject, predicate, data):
+        """creates a staged entry of subject, predicate and object
+
+        :param subject:
+        :param predicate:
+        :param data:
+        :return: ``bytes`` - the blob id
+        """
         blob_id = self.repository.create_blob(data)
         entry = IndexEntry(os.path.join(subject, predicate), blob_id, GIT_FILEMODE_BLOB)
         self.repository.index.add(entry)
         return blob_id
 
     def create(self, subject, **obj):
+        """creates a staged subject entry including its indexed fields.
+
+        :param subject: a string or a :py:class:`Subject` subclass reference
+        :param ``**kw``: the field values
+        :return: an instance of the given subject
+
+        """
         subject = resolve_subject(subject)
         subject_uuid = obj.get('uuid', uuid4().hex)
 
@@ -136,10 +182,19 @@ class GitGraphStore(object):
         return node
 
     def save_nodes(self, *nodes):
+        """creates staged entries for all the given subject nodes, regardless of type
+
+        :param ``*nodes``: a list of subject instances
+        """
+
         for node in nodes:
             self.create(node.__class__.__name__, **node.to_dict())
 
     def merge(self, *nodes):
+        """saves and commits all given nodes
+
+        :param ``*nodes``: a list of subject instances
+        """
         self.save_nodes(*nodes)
         self.commit()
 
@@ -168,6 +223,11 @@ class GitGraphStore(object):
                 )
 
     def get_subject_by_uuid(self, subject_name, uuid):
+        """retrieves a subject by id
+
+        :param subject_name: the subject name or type
+        :param uuid: the uuid value
+        """
         subject_name = resolve_subject_name(subject_name)
         pattern = os.sep.join([subject_name, '_ids', uuid])
         for entry in self.glob(pattern):
@@ -176,6 +236,11 @@ class GitGraphStore(object):
             return Subject.from_data(subject_name, **self.deserialize(blob.data))
 
     def match_subjects_by_index(self, subject_name, field_name, match_callback):
+        """retrieves multiple subjects by indexed field
+
+        :param subject_name: the subject name or type
+        :param uuid: the uuid value
+        """
         subject_name = resolve_subject_name(subject_name)
         pattern = os.sep.join([subject_name or '*', 'indexes', '*'])
         # for index, oid in filter(lambda (index, oid): field_name in index, self.glob(pattern)):
@@ -190,6 +255,7 @@ class GitGraphStore(object):
                 yield Definition(**data)
 
     def commit(self, query=None):
+        """creates a commit with the staged objects"""
         author = None
 
         if not query:
@@ -259,6 +325,9 @@ class Node(object):
         self.__data__ = kw
         self.__data__['uuid'] = uuid
 
+    def __setitem__(self, key, value):
+        self.__data__[key] = value
+
     def to_dict(self):
         return self.__data__.copy()
 
@@ -281,8 +350,8 @@ class Subject(Node):
             raise SubjectDefinitionNotFound('there are no subject subclass defined with the name "{}"'.format(name))
 
     @classmethod
-    def from_data(cls, name, **kw):
-        Definition = cls.definition(name)
+    def from_data(cls, ___name___, **kw):
+        Definition = cls.definition(___name___)
         return Definition(**kw)
 
     def get_related_blob_paths(self, repository):
@@ -304,7 +373,6 @@ class Subject(Node):
         for predicate in self.indexes:
             context['predicate'] = predicate
             paths.append('{subject_name}/indexes/{predicate}/{blob_id}'.format(**context))
-
 
         return map(lambda path: path.format(**context), paths)
 
