@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# <GitGraph - Git-powered database>
+# <GitGraph - Git-powered library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify

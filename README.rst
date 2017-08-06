@@ -1,4 +1,4 @@
-GitGraph - A git-backed graph database
+GitGraph - A git-backed graph library
 ======================================
 
 
