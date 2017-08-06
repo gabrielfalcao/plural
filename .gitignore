@@ -12,3 +12,4 @@ dist/*.gz
 docs/build
 dist/
 tests/*/sandbox
+build/
