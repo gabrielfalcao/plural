@@ -25,3 +25,9 @@ docs:
 clean:
 	@find . -name '*.pyc' -delete
 	@find . -name '#*' -delete
+
+
+release:
+	@./.release
+	@python setup.py build sdist
+	@twine upload dist/*.tar.gz

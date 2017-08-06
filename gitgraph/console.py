@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 import argparse
+import logging
 import coloredlogs
 from gitgraph.server import GraphServer
 from gitgraph.repl import Repl
@@ -54,6 +55,7 @@ def execute_gitgraph_server():  # pragma: no cover
     if args.color:
         coloredlogs.install(level=args.log_level)
 
+    logging.warning('EXPERIMENTAL FEATURE: server')
     try:
         server.run(args.reply_bind_addr)
     except KeyboardInterrupt:
@@ -75,6 +77,7 @@ def execute_gitgraph_client():  # pragma: no cover
     )
 
     args = parser.parse_args()
+    logging.warning('EXPERIMENTAL FEATURE: client')
 
     client = GraphClient(args.address)
 
