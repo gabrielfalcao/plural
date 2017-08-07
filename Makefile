@@ -28,6 +28,7 @@ clean:
 
 
 release:
+	@rm -rf dist/*
 	@./.release
 	@python setup.py build sdist
 	@twine upload dist/*.tar.gz
