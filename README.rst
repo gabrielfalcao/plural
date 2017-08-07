@@ -18,6 +18,8 @@ Declaring Subjects
 
     from gitgraph import GitGraph
     from gitgraph import Subject
+    from gitgraph import codec
+
 
     store = GitGraph('my-git-cms')
 
