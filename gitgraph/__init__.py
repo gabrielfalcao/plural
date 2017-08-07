@@ -18,7 +18,6 @@
 
 import os
 import json
-import socket
 import pygit2
 from hashlib import sha256
 from uuid import uuid4
