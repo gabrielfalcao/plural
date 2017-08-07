@@ -10,13 +10,13 @@ node = Node(__file__).dir
 sandbox = node.cd('sandbox')
 
 
-def with_hexastore(name):
+def with_hexastore(name, **kw):
     if not os.path.exists(sandbox.path):
         os.makedirs(sandbox.path)
 
     def create_store(context):
         context.store_path = sandbox.join(name)
-        context.store = GitGraph(os.path.relpath(context.store_path))
+        context.store = GitGraph(os.path.relpath(context.store_path), **kw)
 
     def destroy_store(context):
         if os.path.isdir(context.store_path):

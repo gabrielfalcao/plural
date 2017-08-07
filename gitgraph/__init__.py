@@ -88,6 +88,7 @@ class GitGraphStore(object):
     def __init__(self, path=None, bare=False, author_name='hexastore', author_email='hexastore@git'):
         path = path or self.__class__.__name__.lower()
         self.path = path
+        self.bare = bare
         self.repository = init_repository(path, bare=bare)
         self.author = Signature(author_name, author_email)
         self.commiter = Signature(author_name, author_email)
@@ -277,7 +278,8 @@ class GitGraphStore(object):
         )
         self.queries = []
         self.repository.head.set_target(commit_id)
-        self.repository.reset(commit_id, GIT_RESET_HARD)
+        if not self.bare:
+            self.repository.reset(commit_id, GIT_RESET_HARD)
         return commit_id
 
 
