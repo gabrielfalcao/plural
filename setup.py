@@ -59,8 +59,6 @@ setup(
     version=read_version(),
     entry_points={
         'console_scripts': [
-            'gitgraph-server = gitgraph.console:execute_gitgraph_server',
-            'gitgraph-client = gitgraph.console:execute_gitgraph_client',
         ],
     },
     description='',

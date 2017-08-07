@@ -90,7 +90,7 @@ class GitGraphStore(object):
         self.path = path
         self.repository = init_repository(path, bare=bare)
         self.author = Signature(author_name, author_email)
-        self.commiter = Signature(os.getlogin(), '@'.join([os.getlogin(), socket.gethostname()]))
+        self.commiter = Signature(author_name, author_email)
         self.queries = []
         self.default_branch = 'refs/heads/master'
 
@@ -327,6 +327,9 @@ class Node(object):
 
     def __setitem__(self, key, value):
         self.__data__[key] = value
+
+    def __getitem__(self, key):
+        return self.__data__[key]
 
     def to_dict(self):
         return self.__data__.copy()

@@ -2,7 +2,6 @@ agentzero==0.3.3
 coloredlogs==7.1
 gevent==1.2.2
 graphene==1.4.1
-nose-randomly==1.2.5
 pygit2==0.26.0
 python-dateutil==2.6.1
-rednose==1.2.2
+plant==0.1.2
