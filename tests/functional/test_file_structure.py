@@ -2,7 +2,7 @@
 
 from gitgraph import Subject
 from gitgraph import codec
-from sure import anything
+from gitgraph.query import predicate
 from tests.functional.helpers import list_file_tree
 from tests.functional.scenarios import with_hexastore
 
@@ -80,6 +80,15 @@ def test_create_subject(context):
     blog_documents = set(store.match_subjects_by_index('Document', 'title', matcher))
     blog_documents.should.have.length_of(1)
     blog_documents.should.equal({docs2})
+
+    blog_documents = set(store.match_subjects_by_index('Document', 'title', predicate('title').contains('Blog')))
+    blog_documents.should.have.length_of(1)
+    blog_documents.should.equal({docs2})
+
+    blog_documents = set(store.match_subjects_by_index('Document', 'title', predicate('title').regex.matches('[Bb]log')))
+    blog_documents.should.have.length_of(1)
+    blog_documents.should.equal({docs2})
+
     set(store.scan_all('Document')).should.equal({
         docs1,
         docs2,
