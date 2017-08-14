@@ -1,6 +1,8 @@
 GitGraph - A git-backed graph library
 ======================================
 
+.. image:: https://travis-ci.com/gabrielfalcao/gitgraph.svg?token=4cxzSYA9PJGD1eDgNWrh&branch=master
+    :target: https://travis-ci.com/gabrielfalcao/gitgraph
 
 Instalation
 -----------
