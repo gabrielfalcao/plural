@@ -2,6 +2,7 @@ agentzero==0.3.3
 coloredlogs==7.1
 gevent==1.2.2
 graphene==1.4.1
+mock==2.0.0
+plant==0.1.2
 pygit2==0.26.0
 python-dateutil==2.6.1
-plant==0.1.2

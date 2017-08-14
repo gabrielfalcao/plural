@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#
 # <GitGraph - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
@@ -15,19 +16,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-import zmq.green as zmq
-from agentzero.core import SocketManager
-
-logger = logging.getLogger('server')
+from uuid import uuid4
+from datetime import datetime
 
 
-class GraphClient(object):
-    def __init__(self, request_connect_addr='tcp://127.0.0.1:6000'):
-        self.context = zmq.Context()
-        self.sockets = SocketManager(zmq, self.context)
-        self.sockets.create('query', zmq.REQ)
+def generate_uuid():
+    return uuid4().hex
 
-    def request(self, data):
-        self.sockets.send_safe('query', data)
-        return self.sockets.recv_safe('query')
+
+def serialize_commit(commit):
+    data = {
+        'author': {
+            'name': commit.author.name,
+            'email': commit.author.email,
+        },
+        'committer': {
+            'name': commit.committer.name,
+            'email': commit.committer.email,
+        },
+        'message': commit.message,
+        'date': datetime.utcfromtimestamp(float(commit.commit_time)),
+    }
+    return data

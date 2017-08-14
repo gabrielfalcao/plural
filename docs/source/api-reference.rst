@@ -7,8 +7,9 @@ API Reference
 Core
 ----
 
-.. automodule:: gitgraph
+.. automodule:: gitgraph.store
    :members:
+
 
 Query
 -----

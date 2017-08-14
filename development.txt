@@ -1,8 +1,9 @@
 -r requirements.txt
-ipdb==0.10.3
-sphinx-rtd-theme==0.2.4
 Sphinx==1.6.3
-sphinxcontrib-websupport==1.0.1
-sure==1.4.6
+coverage==4.4.1
+ipdb==0.10.3
 nose-randomly==1.2.5
 rednose==1.2.2
+sphinx-rtd-theme==0.2.4
+sphinxcontrib-websupport==1.0.1
+sure==1.4.6
