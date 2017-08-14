@@ -15,6 +15,10 @@ matrix:
         - python: 3.7-dev
 
 # command to install dependencies
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libgit2-dev libffi-dev
+
 install:
   - python setup.py build sdist
   - pip install -r development.txt
