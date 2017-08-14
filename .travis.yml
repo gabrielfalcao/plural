@@ -1,5 +1,5 @@
 language: python
-dist: precise
+dist: xenial
 sudo: false
 python:
   - "2.7"
