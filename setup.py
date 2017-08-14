@@ -51,7 +51,7 @@ def local_file(*f):
     return codecs.open(path, 'r', encoding='utf-8').read().encode('utf-8')
 
 
-install_requires = filter(bool, map(bytes.strip, local_file('requirements.txt').splitlines()))
+install_requires = list(filter(bool, map(bytes.strip, local_file('requirements.txt').splitlines())))
 
 
 setup(
