@@ -164,14 +164,14 @@ def test_create(context, add_spo, git_object_hash):
     tesla.to_dict().should.be.a(dict)
 
     add_spo.assert_has_calls([
-        call('Car/objects', 'git-object-hash', '{\n  "brand": "Tesla",\n  "max_speed": "160.4",\n  "model": "Model S",\n  "nickname": "Lightning",\n  "uuid": "generated-uuid4"\n}'),
-        call('Car/_ids', 'generated-uuid4', 'git-object-hash'),
-        call('Car/_uuids', 'git-object-hash', 'generated-uuid4'),
         call('Car/indexes/model', 'git-object-hash', 'Model S'),
         call('Car/indexes/max_speed', 'git-object-hash', '160.4'),
         call('Car/indexes/nickname', 'git-object-hash', 'Lightning'),
         call('Car/indexes/brand', 'git-object-hash', 'Tesla'),
-        call('Car/indexes/uuid', 'git-object-hash', 'generated-uuid4')
+        call('Car/indexes/uuid', 'git-object-hash', 'generated-uuid4'),
+        call('Car/objects', 'git-object-hash', '{\n  "brand": "Tesla",\n  "max_speed": "160.4",\n  "model": "Model S",\n  "nickname": "Lightning",\n  "uuid": "generated-uuid4"\n}'),
+        call('Car/_ids', 'generated-uuid4', 'git-object-hash'),
+        call('Car/_uuids', 'git-object-hash', 'generated-uuid4')
     ])
 
 

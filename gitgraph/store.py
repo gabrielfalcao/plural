@@ -19,7 +19,6 @@
 import os
 import json
 import pygit2
-from uuid import uuid4
 from fnmatch import fnmatch
 
 from pygit2 import GIT_FILEMODE_BLOB
@@ -27,10 +26,11 @@ from pygit2 import GIT_RESET_HARD
 from pygit2 import init_repository
 from pygit2 import IndexEntry
 from pygit2 import Signature
+from gitgraph.meta import subject_has_index
 from gitgraph.models import Subject
 from gitgraph.models import resolve_subject_name
+from gitgraph.util import generate_uuid
 from gitgraph.util import serialize_commit
-from gitgraph.meta import subject_has_index
 
 
 class GitGraphStore(object):
@@ -119,25 +119,28 @@ class GitGraphStore(object):
         predicate_ids = []
 
         subject = resolve_subject_name(subject)
-        subject_uuid = obj.get('uuid', uuid4().hex)
+        subject_uuid = obj.pop('uuid', generate_uuid())
+        obj['uuid'] = subject_uuid
 
         subject_data = self.serialize(obj)
         object_hash = bytes(pygit2.hash(subject_data))
         object_path = os.path.join(subject, 'objects')
+
         id_path = os.path.join(subject, '_ids')
         uuid_path = os.path.join(subject, '_uuids')
+
+        indexes = {}
+        for key in obj.keys():
+            value = obj.get(key, None)
+            if subject_has_index(subject, key):
+                indexes[key] = value
+
+            predicate_path = os.path.join(subject, 'indexes', key)
+            predicate_ids.append(self.add_spo(predicate_path, object_hash, value))
 
         self.add_spo(object_path, object_hash, subject_data)
         self.add_spo(id_path, subject_uuid, object_hash)
         self.add_spo(uuid_path, object_hash, subject_uuid)
-
-        indexes = {}
-        for key in obj.keys():
-            value = obj[key]
-            if subject_has_index(subject, key):
-                indexes[key] = value
-
-            predicate_ids.append(self.add_spo(os.path.join(subject, 'indexes', key), object_hash, value))
 
         self.queries.append(
             ' '.join(map(bytes, ['CREATE', subject, subject_uuid]))

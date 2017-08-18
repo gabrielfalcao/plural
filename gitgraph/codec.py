@@ -20,7 +20,7 @@ from decimal import Decimal
 from dateutil.parser import parse as parse_datetime
 
 
-class Codec(object):
+class Codec(object):  # pragma: no cover
     def decode(self, string):
         raise NotImplementedError
 
