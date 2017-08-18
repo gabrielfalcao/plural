@@ -156,6 +156,5 @@ def test_bare(context):
         docs2,
     })
     list_file_tree(store.path).should.have.length_of(36)
-    store.delete(docs2)
-    store.commit()
+    store.delete(docs2, auto_commit=True)
     list_file_tree(store.path).should.have.length_of(45)
