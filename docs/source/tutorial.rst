@@ -13,7 +13,7 @@ Instalation
 
 .. code:: bash
 
-    pip install gitgraph
+    pip install plural
 
 
 Declaring Subjects
@@ -22,10 +22,10 @@ Declaring Subjects
 
 .. code:: python
 
-    from gitgraph import GitGraph
-    from gitgraph import Subject
+    from plural import Plural
+    from plural import Subject
 
-    store = GitGraph('my-git-cms')
+    store = Plural('my-git-cms')
 
     class Document(Subject):
         indexes = {'title'}
@@ -91,7 +91,7 @@ Many By Indexed Predicate
 .. code:: python
 
 
-    from gitgraph.query import predicate
+    from plural.query import predicate
     # functional
     query = lambda title: 'Blog' in title
 

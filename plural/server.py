@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify

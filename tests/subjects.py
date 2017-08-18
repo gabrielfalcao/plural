@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from gitgraph import Subject
-from gitgraph import codec
+from plural import Subject
+from plural import codec
 
 
 class Vehicle(Subject):

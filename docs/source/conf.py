@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# GitGraph documentation build configuration file, created by
+# Plural documentation build configuration file, created by
 # sphinx-quickstart on Sun Jun 18 21:16:37 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -60,7 +60,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'GitGraph'
+project = u'Plural'
 copyright = u'2017, Gabriel Falcão'
 author = u'Gabriel Falcão'
 
@@ -101,7 +101,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'GitGraphdoc'
+htmlhelp_basename = 'Pluraldoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -128,7 +128,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'GitGraph.tex', u'GitGraph Documentation',
+    (master_doc, 'Plural.tex', u'Plural Documentation',
      u'Gabriel Falcão', 'manual'),
 ]
 
@@ -138,7 +138,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'gitgraph', u'GitGraph Documentation',
+    (master_doc, 'plural', u'Plural Documentation',
      [author], 1)
 ]
 
@@ -149,8 +149,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'GitGraph', u'GitGraph Documentation',
-     author, 'GitGraph', 'One line description of project.',
+    (master_doc, 'Plural', u'Plural Documentation',
+     author, 'Plural', 'One line description of project.',
      'Miscellaneous'),
 ]
 

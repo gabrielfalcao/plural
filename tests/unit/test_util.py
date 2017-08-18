@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from datetime import datetime
 from mock import patch
-from gitgraph.util import generate_uuid
-from gitgraph.util import serialize_commit
+from plural.util import generate_uuid
+from plural.util import serialize_commit
 
 
-@patch('gitgraph.util.uuid4')
+@patch('plural.util.uuid4')
 def test_generate_uuid(uuid4):
     ('generate_uuid() should a hex string')
     uuid4.return_value.hex = 'deadbeefdeadbeef'

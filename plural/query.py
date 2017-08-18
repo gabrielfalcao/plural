@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ class predicate(Query):
         ::
 
             >>> from re import IGNORECASE
-            >>> from gitgraph.query import predicate
+            >>> from plural.query import predicate
             >>>
             >>> query = predicate('email').regex.matches('@gmail.com', IGNORECASE)
         """
@@ -65,7 +65,7 @@ class predicate(Query):
         ::
 
             >>> from re import IGNORECASE
-            >>> from gitgraph.query import predicate
+            >>> from plural.query import predicate
             >>>
             >>> query1 = predicate('email').contains('@gmail.com')
             >>>

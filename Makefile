@@ -2,7 +2,7 @@
 # .RECIPEPREFIX = "    "
 
 
-.PHONY: gitgraph dist tests pip docs
+.PHONY: plural dist tests pip docs
 
 all: clean tests
 
@@ -39,4 +39,4 @@ numbers:
 
 
 docker_image:
-	@docker build -t gitgraph .
+	@docker build -t plural .

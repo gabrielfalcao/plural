@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from gitgraph.query import predicate
+from plural.query import predicate
 from tests.functional.helpers import list_file_tree
 from tests.functional.scenarios import with_hexastore
 from tests.subjects import Document

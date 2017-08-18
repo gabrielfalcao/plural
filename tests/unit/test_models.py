@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from mock import MagicMock
-from gitgraph.models import Subject
-from gitgraph.models import resolve_subject_name
-from gitgraph.models import resolve_subject
-from gitgraph.exceptions import SubjectDefinitionNotFound
+from plural.models import Subject
+from plural.models import resolve_subject_name
+from plural.models import resolve_subject
+from plural.exceptions import SubjectDefinitionNotFound
 
 from tests.subjects import Car, Vehicle
 from tests.unit.scenarios import BlobStub

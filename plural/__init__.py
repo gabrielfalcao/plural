@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gitgraph.models import resolve_subject_name
-from gitgraph.models import resolve_subject
-from gitgraph.store import serialize_commit
-from gitgraph.store import GitGraphStore
-from gitgraph.models import Subject
-from gitgraph.exceptions import SubjectDefinitionNotFound
-from gitgraph.exceptions import InvalidSubjectDefinition
+from plural.models import resolve_subject_name
+from plural.models import resolve_subject
+from plural.store import serialize_commit
+from plural.store import PluralStore
+from plural.models import Subject
+from plural.exceptions import SubjectDefinitionNotFound
+from plural.exceptions import InvalidSubjectDefinition
 
 
-class GitGraph(GitGraphStore):
+class Plural(PluralStore):
     pass
 
 
@@ -33,8 +33,8 @@ __all__ = (
     'resolve_subject',
     'resolve_subject_name',
     'serialize_commit',
-    'GitGraphStore',
-    'GitGraph',
+    'PluralStore',
+    'Plural',
     'Subject',
     'SubjectDefinitionNotFound',
     'InvalidSubjectDefinition',

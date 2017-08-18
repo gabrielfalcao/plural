@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,15 +20,15 @@ import hashlib
 from mock import patch
 from sure import scenario
 
-from gitgraph.store import GitGraphStore
+from plural.store import PluralStore
 
 
 def with_graph_store(*args, **kw):
 
-    @patch('gitgraph.store.Signature')
-    @patch('gitgraph.store.init_repository')
+    @patch('plural.store.Signature')
+    @patch('plural.store.init_repository')
     def setup(context, init_repository, Signature):
-        context.store = GitGraphStore(*args, **kw)
+        context.store = PluralStore(*args, **kw)
         context.init_repository = init_repository
         context.Signature = Signature
 

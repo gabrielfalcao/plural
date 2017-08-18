@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED true
 ENV VIRTUAL_ENV      /usr/local/virtualenv
 ENV PATH             $VIRTUAL_ENV/bin:$PATH
 ENV PYTHONPATH       $PYTHONPATH:$VIRTUAL_ENV/lib/python2.7/site-packages
-ENV HOME             /gitgraph
+ENV HOME             /plural
 RUN echo 'source /usr/local/virtualenv/bin/activate' >> /etc/bash.bashrc
 
 RUN apt-get update \
@@ -71,8 +71,8 @@ RUN pip install virtualenv \
 
 RUN pip install -U ipdb twine
 
-COPY . /gitgraph
+COPY . /plural
 
-WORKDIR /gitgraph
+WORKDIR /plural
 
-RUN pip install -U -r /gitgraph/development.txt
+RUN pip install -U -r /plural/development.txt

@@ -7,24 +7,24 @@ API Reference
 Store
 -----
 
-.. automodule:: gitgraph.store
+.. automodule:: plural.store
    :members:
 
 
 Models
 ------
 
-.. automodule:: gitgraph.models
+.. automodule:: plural.models
    :members:
 
 Codecs
 ------
 
-.. automodule:: gitgraph.codec
+.. automodule:: plural.codec
    :members:
 
 Query
 -----
 
-.. automodule:: gitgraph.query
+.. automodule:: plural.query
    :members:

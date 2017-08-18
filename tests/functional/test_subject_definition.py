@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from gitgraph import Subject
-from gitgraph import SubjectDefinitionNotFound
-from gitgraph import InvalidSubjectDefinition
+from plural import Subject
+from plural import SubjectDefinitionNotFound
+from plural import InvalidSubjectDefinition
 
 
 def define_subject_without_indexes():

@@ -1,1 +1,1 @@
-include COPYING *.rst docs/* gitgraph/storage/redis-lua-scripts/* gitgraph/storage/* docs/source/* requirements.txt gitgraph/web gitgraph/web/* gitgraph/web/dist gitgraph/web/dist/* gitgraph/web/templates gitgraph/web/templates/*
+include COPYING *.rst docs/* plural/storage/redis-lua-scripts/* plural/storage/* docs/source/* requirements.txt plural/web plural/web/* plural/web/dist plural/web/dist/* plural/web/templates plural/web/templates/*

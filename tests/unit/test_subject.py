@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
-from gitgraph.models import Subject
-from gitgraph.meta import subject_has_index
-from gitgraph.exceptions import InvalidSubjectDefinition
-from gitgraph.exceptions import SubjectDefinitionNotFound
+from plural.models import Subject
+from plural.meta import subject_has_index
+from plural.exceptions import InvalidSubjectDefinition
+from plural.exceptions import SubjectDefinitionNotFound
 
 
 class Person(Subject):

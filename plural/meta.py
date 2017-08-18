@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from gitgraph.exceptions import InvalidSubjectDefinition
+from plural.exceptions import InvalidSubjectDefinition
 
 
 SUBJECTS = OrderedDict()
@@ -52,7 +52,7 @@ class Node(object):
 
 
 def is_node_subclass(cls):
-    return isinstance(cls, type) and issubclass(cls, Node) and cls is not Node and not cls.__module__.startswith('gitgraph.')
+    return isinstance(cls, type) and issubclass(cls, Node) and cls is not Node and not cls.__module__.startswith('plural.')
 
 
 class MetaSubject(type):

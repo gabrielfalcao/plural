@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,18 +18,18 @@
 from pygit2 import GIT_FILEMODE_BLOB
 from mock import patch, call, MagicMock
 
-from gitgraph.store import GitGraphStore
+from plural.store import PluralStore
 from tests.subjects import Car
 from .scenarios import with_graph_store
 
 
-@patch('gitgraph.store.Signature')
-@patch('gitgraph.store.init_repository')
+@patch('plural.store.Signature')
+@patch('plural.store.init_repository')
 def test_constructor(init_repository, Signature):
-    ('GitGraphStore.add_remote() should create a remote')
+    ('PluralStore.add_remote() should create a remote')
 
     repository = MagicMock(name='repository')
-    store = GitGraphStore(
+    store = PluralStore(
         '/opt/git',
         True,
         'User Name',
@@ -53,10 +53,10 @@ def test_constructor(init_repository, Signature):
 
 
 @with_graph_store('/path/to/folder')
-@patch('gitgraph.store.Signature')
-@patch('gitgraph.store.init_repository')
+@patch('plural.store.Signature')
+@patch('plural.store.init_repository')
 def test_add_remote(context, init_repository, Signature):
-    ('GitGraphStore.add_remote() should create a remote')
+    ('PluralStore.add_remote() should create a remote')
 
     context.store.add_remote('name', 'ssh://user@remote:path')
 
@@ -68,7 +68,7 @@ def test_add_remote(context, init_repository, Signature):
 
 @with_graph_store('/path/to/folder')
 def test_serialize(context):
-    ('GitGraphStore.serialize() should return a pretty json string')
+    ('PluralStore.serialize() should return a pretty json string')
 
     result = context.store.serialize({
         'foo': 'bar',
@@ -79,7 +79,7 @@ def test_serialize(context):
 
 @with_graph_store('/path/to/folder')
 def test_deserialize(context):
-    ('GitGraphStore.deserialize() should parse a json object')
+    ('PluralStore.deserialize() should parse a json object')
 
     result = context.store.deserialize('{\n  "foo": "bar"\n}')
     result.should.equal({
@@ -88,10 +88,10 @@ def test_deserialize(context):
 
 
 @with_graph_store('/path/to/folder')
-@patch('gitgraph.store.pygit2')
-@patch('gitgraph.store.serialize_commit')
+@patch('plural.store.pygit2')
+@patch('plural.store.serialize_commit')
 def test_iter_versions(context, serialize_commit, pygit2):
-    ('GitGraphStore.iter_versions() should return a generator of serialized commits')
+    ('PluralStore.iter_versions() should return a generator of serialized commits')
 
     serialize_commit.side_effect = lambda c: 'SERIALIZED:{}'.format(c)
     context.store.repository.walk.return_value = [
@@ -111,10 +111,10 @@ def test_iter_versions(context, serialize_commit, pygit2):
 
 
 @with_graph_store('/path/to/folder')
-@patch('gitgraph.store.pygit2')
-@patch('gitgraph.store.serialize_commit')
+@patch('plural.store.pygit2')
+@patch('plural.store.serialize_commit')
 def test_get_versions(context, serialize_commit, pygit2):
-    ('GitGraphStore.iter_versions() should return a generator of serialized commits')
+    ('PluralStore.iter_versions() should return a generator of serialized commits')
 
     serialize_commit.side_effect = lambda c: 'SERIALIZED:{}'.format(c)
     context.store.repository.walk.return_value = [
@@ -131,9 +131,9 @@ def test_get_versions(context, serialize_commit, pygit2):
 
 
 @with_graph_store('/path/to/folder')
-@patch('gitgraph.store.IndexEntry')
+@patch('plural.store.IndexEntry')
 def test_add_spo(context, IndexEntry):
-    ('GitGraphStore.add_spo() should add an IndexEntry to the repo')
+    ('PluralStore.add_spo() should add an IndexEntry to the repo')
 
     context.store.repository.create_blob.return_value = 'blob-id'
     IndexEntry.return_value = 'index-entry'
@@ -146,10 +146,10 @@ def test_add_spo(context, IndexEntry):
 
 
 @with_graph_store('/path/to/folder')
-@patch('gitgraph.store.pygit2.hash')
-@patch('gitgraph.store.GitGraphStore.add_spo')
+@patch('plural.store.pygit2.hash')
+@patch('plural.store.PluralStore.add_spo')
 def test_create(context, add_spo, git_object_hash):
-    ('GitGraphStore.create() should add spos for its indexes')
+    ('PluralStore.create() should add spos for its indexes')
 
     git_object_hash.return_value = 'git-object-hash'
     data = {
@@ -176,9 +176,9 @@ def test_create(context, add_spo, git_object_hash):
 
 
 @with_graph_store('/path/to/folder')
-@patch('gitgraph.store.GitGraphStore.create')
+@patch('plural.store.PluralStore.create')
 def test_save_nodes(context, create):
-    ('GitGraphStore.save_nodes() should .create() each given node ')
+    ('PluralStore.save_nodes() should .create() each given node ')
     create.side_effect = lambda name, **data: 'mock-{}'.format(name.lower())
     car1 = Car(uuid='uuid1', brand='Ferrari', model='F1')
     car2 = Car(uuid='uuid2', brand='Tesla', model='Model S')
@@ -194,10 +194,10 @@ def test_save_nodes(context, create):
 
 
 @with_graph_store('/path/to/folder')
-@patch('gitgraph.store.GitGraphStore.save_nodes')
-@patch('gitgraph.store.GitGraphStore.commit')
+@patch('plural.store.PluralStore.save_nodes')
+@patch('plural.store.PluralStore.commit')
 def test_merge(context, commit, save_nodes):
-    ('GitGraphStore.merge() should .save_nodes() and .commit()')
+    ('PluralStore.merge() should .save_nodes() and .commit()')
 
     save_nodes.return_value = 'the-saved-nodes'
 

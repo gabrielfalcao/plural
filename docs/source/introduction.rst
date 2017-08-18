@@ -12,7 +12,7 @@ Installing
 
 .. code:: bash
 
-   pip install gitgraph
+   pip install plural
 
 Concepts
 ~~~~~~~~

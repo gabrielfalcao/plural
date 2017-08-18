@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,14 +26,14 @@ from pygit2 import GIT_RESET_HARD
 from pygit2 import init_repository
 from pygit2 import IndexEntry
 from pygit2 import Signature
-from gitgraph.meta import subject_has_index
-from gitgraph.models import Subject
-from gitgraph.models import resolve_subject_name
-from gitgraph.util import generate_uuid
-from gitgraph.util import serialize_commit
+from plural.meta import subject_has_index
+from plural.models import Subject
+from plural.models import resolve_subject_name
+from plural.util import generate_uuid
+from plural.util import serialize_commit
 
 
-class GitGraphStore(object):
+class PluralStore(object):
     """Data store that manipulates a single git repository
 
     :param path: ``bytes`` - the path to the git repository ``string``

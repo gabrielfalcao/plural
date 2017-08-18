@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,16 @@ import sys
 import argparse
 import logging
 import coloredlogs
-from gitgraph.server import GraphServer
-from gitgraph.repl import Repl
-from gitgraph.client import GraphClient
+from plural.server import GraphServer
+from plural.repl import Repl
+from plural.client import GraphClient
 
 coloredlogs.DEFAULT_LOG_FORMAT = '%(asctime)s %(levelname)s %(message)s'
 
 
-def execute_gitgraph_server():  # pragma: no cover
+def execute_plural_server():  # pragma: no cover
     parser = argparse.ArgumentParser(
-        prog='gitgraph-server',
+        prog='plural-server',
         description='ZMQ Reply Server that executes queries')
 
     parser.add_argument(
@@ -66,9 +66,9 @@ def execute_gitgraph_server():  # pragma: no cover
         sys.stderr.flush()
 
 
-def execute_gitgraph_client():  # pragma: no cover
+def execute_plural_client():  # pragma: no cover
     parser = argparse.ArgumentParser(
-        prog='gitgraph-client',
+        prog='plural-client',
         description='ZMQ client')
     parser.add_argument(
         '-a', '--address',

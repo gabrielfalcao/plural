@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ class VersionFinder(ast.NodeVisitor):
 
 def read_version():
     finder = VersionFinder()
-    finder.visit(ast.parse(local_file('gitgraph', 'version.py')))
+    finder.visit(ast.parse(local_file('plural', 'version.py')))
     return finder.version
 
 
@@ -55,7 +55,7 @@ install_requires = list(filter(bool, map(bytes.strip, local_file('requirements.t
 
 
 setup(
-    name='gitgraph',
+    name='plural',
     version=read_version(),
     entry_points={
         'console_scripts': [
@@ -65,12 +65,12 @@ setup(
     long_description=local_file('README.rst'),
     author=u'Gabriel Falcao',
     author_email='gabriel@nacaolivre.org',
-    url='https://github.com/gabrielfalcao/gitgraph',
+    url='https://github.com/gabrielfalcao/plural',
     packages=find_packages(exclude=['*tests*']),
     install_requires=install_requires,
     include_package_data=True,
     package_data={
-        'gitgraph': '*.txt *.png *.gif *.yml *.rst docs/source/*'.split(),
+        'plural': '*.txt *.png *.gif *.yml *.rst docs/source/*'.split(),
     },
     zip_safe=False,
 )

@@ -2,7 +2,7 @@
 import os
 import shutil
 from plant import Node
-from gitgraph import GitGraph
+from plural import Plural
 
 from sure import scenario
 
@@ -16,7 +16,7 @@ def with_hexastore(name, **kw):
 
     def create_store(context):
         context.store_path = sandbox.join(name)
-        context.store = GitGraph(os.path.relpath(context.store_path), **kw)
+        context.store = Plural(os.path.relpath(context.store_path), **kw)
 
     def destroy_store(context):
         if os.path.isdir(context.store_path):

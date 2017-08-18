@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# <GitGraph - Git-powered graph database library>
+# <Plural - Git-powered graph database library>
 # Copyright (C) <2017>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
 from hashlib import sha256
-from gitgraph.meta import MetaSubject
-from gitgraph.meta import Node
-from gitgraph.meta import SUBJECTS
-from gitgraph.util import generate_uuid
+from plural.meta import MetaSubject
+from plural.meta import Node
+from plural.meta import SUBJECTS
+from plural.util import generate_uuid
 
-from gitgraph.exceptions import SubjectDefinitionNotFound
+from plural.exceptions import SubjectDefinitionNotFound
 
 
 def resolve_subject_name(subj):
