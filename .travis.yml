@@ -19,7 +19,8 @@ matrix:
 # command to install dependencies
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y build-essential ca-certificates curl cmake libc6-dev libevent-dev libffi-dev libzmq3-dev openssl pkg-config python-pip python2.7-dev
+  - sudo apt-get install -y bash build-essential ca-certificates curl cmake libffi-dev pkg-config python-pip python2.7-dev
+  - bash install-libgit2.sh
 
 env:
   - LIBGIT2_VERSION=0.26.0
