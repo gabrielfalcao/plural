@@ -1,34 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from gitgraph import Subject
-from gitgraph import codec
 from gitgraph.query import predicate
 from tests.functional.helpers import list_file_tree
 from tests.functional.scenarios import with_hexastore
-
-
-class Tag(Subject):
-    indexes = {'name'}
-
-
-class Author(Subject):
-    indexes = {
-        'name',
-        'email',
-    }
-
-
-class Document(Subject):
-    indexes = {'title', 'content'}
-    fields = {
-        'title': codec.Unicode,
-    }
-    incoming = {
-        'authored_by': Author,
-    }
-    outgoing = {
-        'contains': Tag,
-    }
+from tests.subjects import Document
 
 
 @with_hexastore('cms')
@@ -184,8 +159,3 @@ def test_bare(context):
     store.delete(docs2)
     store.commit()
     list_file_tree(store.path).should.have.length_of(45)
-
-
-
-if __name__ == '__main__':
-    test()

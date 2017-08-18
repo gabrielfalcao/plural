@@ -20,7 +20,6 @@ import hashlib
 from mock import patch
 from sure import scenario
 
-from gitgraph.models import Subject
 from gitgraph.store import GitGraphStore
 
 
@@ -50,17 +49,3 @@ class RepositoryStub(object):
     def __init__(self, list_of_dicts):
         self.list_of_dicts = list_of_dicts
         self.index = dict([(b.oid, b) for b in map(BlobStub, map(json.dumps, list_of_dicts))])
-
-
-class Vehicle(Subject):
-    indexes = {
-        'max_speed',
-        'min_speed',
-    }
-
-
-class Car(Vehicle):
-    indexes = {
-        'brand',
-        'model',
-    }

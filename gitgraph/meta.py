@@ -52,21 +52,22 @@ class Node(object):
 
     def __init__(self, uuid=None, **kw):
         self.uuid = kw.get('uuid', uuid)
-        self.__data__ = kw
+        self.__data__ = dict([(k, self.decode_field(k, v)) for k, v in kw.items()])
         self.__data__['uuid'] = uuid or generate_uuid()
 
     def __setitem__(self, key, value):
-        self.__data__[key] = value
+        self.__data__[key] = self.encode_field(key, value)
 
     def __contains__(self, key):
         return key in self.__data__
 
     def __getitem__(self, key):
-        return self.__data__[key]
+        value = self.__data__[key]
+        return self.decode_field(key, value)
 
     def __setattr__(self, key, value):
         if key in self.__fields__:
-            self.__data__[key] = value
+            self.__data__[key] = self.encode_field(key, value)
         else:
             object.__setattr__(self, key, value)
 
@@ -77,13 +78,28 @@ class Node(object):
         if key not in self.__data__:
             raise AttributeError('key not found: {}'.format(key))
 
-        return self.__data__[key]
+        value = self.__data__[key]
+        return self.decode_field(key, value)
 
     def to_dict(self):
-        return self.__data__.copy()
+        return dict([(k, self.encode_field(k, v)) for k, v in self.__data__.items()])
 
     def to_json(self, **kw):
         return json.dumps(self.to_dict(), **kw)
+
+    def decode_field(self, name, value):
+        codec = self.__codecs__.get(name)
+        if not codec:
+            return value
+
+        return codec.decode(value)
+
+    def encode_field(self, name, value):
+        codec = self.__codecs__.get(name)
+        if not codec:
+            return value
+
+        return codec.encode(value)
 
 
 def is_node_subclass(cls):
@@ -93,6 +109,7 @@ def is_node_subclass(cls):
 class MetaSubject(type):
     def __init__(cls, name, bases, members):
         indexes = set()
+        codecs = {}
 
         if name not in ('MetaSubject', 'Subject') and cls.__module__ != __name__:
             SUBJECTS[name] = cls
@@ -105,7 +122,12 @@ class MetaSubject(type):
             parent_indexes = getattr(parent, 'indexes', set())
             fields = fields.union(set(parent_indexes))
 
+            parent_codecs = getattr(parent, 'fields', {})
+            codecs.update(parent_codecs)
+
+        codecs.update(getattr(cls, 'fields', {}))
         cls.indexes = fields
         cls.__fields__ = {'uuid'}.union(fields)
         cls.__data__ = {}
+        cls.__codecs__ = dict([(n, Codec()) for n, Codec in codecs.items()])
         super(MetaSubject, cls).__init__(name, bases, members)

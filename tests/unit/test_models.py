@@ -21,8 +21,8 @@ from gitgraph.models import resolve_subject_name
 from gitgraph.models import resolve_subject
 from gitgraph.exceptions import SubjectDefinitionNotFound
 
-from .scenarios import Vehicle, Car
-from .scenarios import BlobStub
+from tests.subjects import Car, Vehicle
+from tests.unit.scenarios import BlobStub
 
 
 def test_resolve_subject_name():
@@ -62,7 +62,6 @@ def test_subclasses_inherit_indexes():
 
     Car.indexes.should.equal({
         'max_speed',
-        'min_speed',
         'brand',
         'model',
     })
@@ -85,5 +84,4 @@ def test_get_related_blob_paths():
         'Car/indexes/brand/4616f0d04cf8d19dbe59f14a8225487e40061ba8',
         'Car/indexes/max_speed/4616f0d04cf8d19dbe59f14a8225487e40061ba8',
         'Car/indexes/model/4616f0d04cf8d19dbe59f14a8225487e40061ba8',
-        'Car/indexes/min_speed/4616f0d04cf8d19dbe59f14a8225487e40061ba8'
     ])
