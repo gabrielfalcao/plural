@@ -13,3 +13,4 @@ TODO:
 - Replication through git-push
 - Merge strategies *(git flow?)*
 - Use git-hooks for real time notifications
+- Allow arguments in codecs, i.e.: ``codec.DateTime(utc=True, _now=True)``

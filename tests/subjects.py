@@ -28,6 +28,15 @@ class Vehicle(Subject):
     }
 
 
+class Person(Subject):
+    indexes = {
+        'name',
+    }
+    fields = {
+        'name': codec.Unicode,
+    }
+
+
 class Car(Vehicle):
     indexes = {
         'brand',
@@ -39,6 +48,14 @@ class Car(Vehicle):
         'last_used': codec.DateTime,
         'metadata': codec.JSON,
     }
+
+    sold_by = Person.v.incoming({
+        'contract_signed_at': codec.DateTime,
+    }, 'sales')
+
+    bought_by = Person.v.outgoing({
+        'contract_signed_at': codec.DateTime,
+    }, 'purchases')
 
 
 class Tag(Subject):
@@ -57,9 +74,12 @@ class Document(Subject):
     fields = {
         'title': codec.Unicode,
     }
-    incoming = {
-        'authored_by': Author,
-    }
-    outgoing = {
-        'contains': Tag,
-    }
+
+    authored_by = Author.v.incoming({
+        'created_at': codec.DateTime,
+        'modified_at': codec.DateTime,
+    }, 'documents')
+
+    tagged_by = Tag.v.outgoing([
+        ('created_at', codec.DateTime),
+    ], 'documents')

@@ -16,12 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from collections import OrderedDict
+from plural.models.element import Element
 from plural.exceptions import InvalidSubjectDefinition
 
 
 SUBJECTS = OrderedDict()
 SUBJECTS_BY_CLASS = OrderedDict()
+SUBJECT_VERTEXES = defaultdict(OrderedDict)
+
+VERTEXES = OrderedDict()
+VERTEXES_BY_CLASS = OrderedDict()
+VERTEXES = OrderedDict
 
 
 def subject_has_index(name, key):
@@ -46,13 +53,59 @@ def validate_subject_definition(name, cls, members):
     return indexes
 
 
-class Node(object):
-    """baseclass of Subject, exists solely for meta-programming purposes"""
-    pass
+class Vertex(object):
+    def __init__(self, target, attributes, reverse_label=None):
+        self.origin = None
+        self.target = target
+        self.codecs = attributes
+        self.reverse_label = None
+
+    def attach_origin(self, origin):
+        self.origin = origin
+        SUBJECT_VERTEXES[self.origin][self.direction] = self
+        if not self.reverse_label:
+            origin_name = origin.__name__.lower()
+            self.reverse_label = "{}s".format(origin_name)
+
+    def is_attached(self):
+        return is_node_subclass(self.origin)
+
+
+class IncomingVertex(Vertex):
+    """represents a vertex coming from the origin into the target
+    (O)-[v]->(T)
+    """
+    direction = 'incoming'
+
+
+class OutgoingVertex(Vertex):
+    """represents a vertex going out the target into the origin
+    (O)<-[v]-(T)
+
+    """
+    direction = 'outgoing'
+
+
+class IndirectVertex(Vertex):
+    """represents a vertex that connects two edges without direction
+    (O)-[v]-(T)
+    """
+    direction = 'indirect'
+
+
+class VertexFactory(object):
+    def __init__(self, subject):
+        self.target = subject
+
+    def incoming(self, attributes=None, reverse_label=None):
+        return IncomingVertex(self.target, attributes=dict(attributes or {}), reverse_label=reverse_label)
+
+    def outgoing(self, attributes=None, reverse_label=None):
+        return OutgoingVertex(self.target, attributes=dict(attributes or {}), reverse_label=reverse_label)
 
 
 def is_node_subclass(cls):
-    return isinstance(cls, type) and issubclass(cls, Node) and cls is not Node and not cls.__module__.startswith('plural.')
+    return isinstance(cls, type) and issubclass(cls, Element) and cls is not Element and not cls.__module__.startswith('plural.')
 
 
 class MetaSubject(type):
@@ -76,6 +129,7 @@ class MetaSubject(type):
 
         codecs.update(getattr(cls, 'fields', {}))
         cls.indexes = fields
+        cls.v = VertexFactory(cls)
         cls.__fields__ = {'uuid'}.union(fields)
         cls.__data__ = {}
         cls.__codecs__ = dict([(n, Codec()) for n, Codec in codecs.items()])

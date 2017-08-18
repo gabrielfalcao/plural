@@ -17,53 +17,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
 from hashlib import sha256
-from plural.meta import MetaSubject
-from plural.meta import Node
-from plural.meta import SUBJECTS
 from plural.util import generate_uuid
 
-from plural.exceptions import SubjectDefinitionNotFound
+from plural.exceptions import ElementDefinitionNotFound
 
 
-def resolve_subject_name(subj):
-    """
-    :param subj: an :py:class:`Subject` instance or string
-    :returns: a string
-    """
-    if isinstance(subj, type) and issubclass(subj, Subject):
-        return subj.__name__
-    elif subj is None:
-        return '*'
-    elif isinstance(subj, basestring):
-        return subj
-    else:
-        msg = (
-            'resolve_subject_name() takes a Subject subclass, '
-            'a string or None. Got {}'
-        )
-        raise TypeError(msg.format(repr(subj)))
-
-
-def resolve_subject(subj):
-    """
-    :param subj: an :py:class:`Subject` instance or string
-    :returns: a :py:class:`Subject` subclass
-    """
-    if isinstance(subj, type) and issubclass(subj, Subject):
-        return subj
-    elif isinstance(subj, basestring):
-        return SUBJECTS[subj]
-    else:
-        msg = (
-            'resolve_subject() takes a Subject subclass or '
-            'a string. Got {}'
-        )
-        raise TypeError(msg.format(repr(subj)))
-
-
-class Subject(Node):
+class Element(object):
     """represents a node type (or "model", if you will)."""
-    __metaclass__ = MetaSubject
+
     def __init__(self, uuid=None, **kw):
         self.uuid = kw.get('uuid', uuid)
         self.__data__ = dict([(k, self.decode_field(k, v)) for k, v in kw.items()])
@@ -87,7 +48,7 @@ class Subject(Node):
 
     def __getattr__(self, key):
         if key.startswith('__'):
-            return super(Node, self).__getattribute__(key)
+            return super(Element, self).__getattribute__(key)
 
         if key not in self.__data__:
             raise AttributeError('key not found: {}'.format(key))
@@ -118,24 +79,24 @@ class Subject(Node):
     @staticmethod
     def definition(name):
         """
-        resolves a :py:class:`Subject` by its type name
+        resolves a :py:class:`Element` by its type name
 
         :param name: a dictionary
-        :returns: the given :py:class:`Subject` subclass
+        :returns: the given :py:class:`Element` subclass
         """
         try:
-            return resolve_subject(name)
+            return resolve_element(name)
         except KeyError:
-            raise SubjectDefinitionNotFound('there are no subject subclass defined with the name "{}"'.format(name))
+            raise ElementDefinitionNotFound('there are no element subclass defined with the name "{}"'.format(name))
 
     @classmethod
     def from_data(cls, ___name___=None, **kw):
         """
-        creates a new instance of the given :py:class:`Subject` with the provided ``**kwargs``
+        creates a new instance of the given :py:class:`Element` with the provided ``**kwargs``
 
-        :param ___name___: the name of the subject type
+        :param ___name___: the name of the element type
         :param ``**kw``: a dictionary
-        :returns: an instance of the given :py:class:`Subject` subclass
+        :returns: an instance of the given :py:class:`Element` subclass
         """
         name = ___name___ or cls.__name__
         Definition = cls.definition(name)
@@ -144,38 +105,38 @@ class Subject(Node):
     @classmethod
     def from_dict(Definition, data):
         """
-        creates a new instance of the given :py:class:`Subject` with the provided ``data``
+        creates a new instance of the given :py:class:`Element` with the provided ``data``
 
         :param data: a dictionary
-        :returns: an instance of the given :py:class:`Subject` subclass
+        :returns: an instance of the given :py:class:`Element` subclass
         """
         return Definition(**data)
 
     def get_related_blob_paths(self, repository):
         """
-        returns a list of all possible blob paths of a subject instance.
+        returns a list of all possible blob paths of a element instance.
 
         :param repository: a ``pygit2.Repository``
-        :returns: the given :py:class:`Subject` subclass
+        :returns: the given :py:class:`Element` subclass
         """
-        subject_name = self.__class__.__name__
+        element_name = self.__class__.__name__
         uuid = self.uuid
-        blob_id_path = '{subject_name}/_ids/{uuid}'.format(**locals())
+        blob_id_path = '{element_name}/_ids/{uuid}'.format(**locals())
         blob_id = repository[repository.index[blob_id_path].oid].data
         context = {
-            'subject_name': subject_name,
+            'element_name': element_name,
             'blob_id': blob_id,
             'uuid': uuid,
         }
         paths = [
-            '{subject_name}/_ids/{uuid}',
-            '{subject_name}/_uuids/{blob_id}',
-            '{subject_name}/indexes/uuid/{blob_id}',
-            '{subject_name}/objects/{blob_id}',
+            '{element_name}/_ids/{uuid}',
+            '{element_name}/_uuids/{blob_id}',
+            '{element_name}/indexes/uuid/{blob_id}',
+            '{element_name}/objects/{blob_id}',
         ]
         for predicate in self.indexes:
             context['predicate'] = predicate
-            paths.append('{subject_name}/indexes/{predicate}/{blob_id}'.format(**context))
+            paths.append('{element_name}/indexes/{predicate}/{blob_id}'.format(**context))
 
         return map(lambda path: path.format(**context), paths)
 
@@ -189,4 +150,4 @@ class Subject(Node):
         return bytes(self)
 
     def __eq__(self, other):
-        return isinstance(other, Node) and self.to_dict() == other.to_dict()
+        return isinstance(other, Element) and self.to_dict() == other.to_dict()

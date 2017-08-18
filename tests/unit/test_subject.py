@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
-from plural.models import Subject
+from plural.models.edges import Subject
 from plural.meta import subject_has_index
 from plural.exceptions import InvalidSubjectDefinition
 from plural.exceptions import SubjectDefinitionNotFound

@@ -16,26 +16,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from plural.models.edges import resolve_subject_name
-from plural.models.edges import resolve_subject
-from plural.store import serialize_commit
-from plural.store import PluralStore
-from plural.models.edges import Subject
-from plural.exceptions import SubjectDefinitionNotFound
-from plural.exceptions import InvalidSubjectDefinition
-
-
-class Plural(PluralStore):
-    pass
-
-
-__all__ = (
-    'resolve_subject',
-    'resolve_subject_name',
-    'serialize_commit',
-    'PluralStore',
-    'Plural',
-    'Subject',
-    'SubjectDefinitionNotFound',
-    'InvalidSubjectDefinition',
-)
+__all__ = []

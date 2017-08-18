@@ -27,8 +27,8 @@ from pygit2 import init_repository
 from pygit2 import IndexEntry
 from pygit2 import Signature
 from plural.meta import subject_has_index
-from plural.models import Subject
-from plural.models import resolve_subject_name
+from plural.models.edges import Subject
+from plural.models.edges import resolve_subject_name
 from plural.util import generate_uuid
 from plural.util import serialize_commit
 

@@ -20,5 +20,14 @@
 class InvalidSubjectDefinition(Exception):
     """raised when a :py:class:`Subject` has an invalid definition"""
 
-class SubjectDefinitionNotFound(Exception):
+
+class ElementDefinitionNotFound(Exception):
+    """raised when a :py:class:`Element` has an invalid definition"""
+
+
+class VertexDefinitionNotFound(ElementDefinitionNotFound):
+    """raised when a :py:class:`Vertex` has an invalid definition"""
+
+
+class SubjectDefinitionNotFound(ElementDefinitionNotFound):
     """raised when a :py:class:`Subject` has an invalid definition"""
