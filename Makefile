@@ -36,3 +36,7 @@ release:
 
 numbers:
 	@python nums.py
+
+
+docker_image:
+	@docker build -t gitgraph .

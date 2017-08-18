@@ -2,6 +2,9 @@ language: python
 dist: xenial
 sudo: required
 
+services:
+  - docker
+
 python:
   - "2.7"
   # - "3.3"
@@ -17,21 +20,13 @@ matrix:
         - python: 3.7-dev
 
 # command to install dependencies
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y gcc-5 build-essential ca-certificates curl cmake libc6-dev libevent-dev libffi-dev libzmq3-dev openssl pkg-config python-pip python2.7-dev
+install:
+  - docker build -t gitgraph .
 
 env:
   - LIBGIT2_VERSION=0.26.0
 
-install:
-  - python setup.py build sdist
-  - pip install -r development.txt
-  - pip install -U pip
-  - cd /tmp && wget -q https://github.com/libgit2/libgit2/archive/v${LIBGIT2_VERSION}.tar.gz && tar xzvf v${LIBGIT2_VERSION}.tar.gz && cd libgit2-${LIBGIT2_VERSION} && mkdir -p build/install && cd build && cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..  cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr --build . make install
-
-# command to run tests
-script: nosetests
+script: docker run -v .:/gitgraph gitgraph nosetests
 
 # automated pypi releases
 deploy:
