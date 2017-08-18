@@ -12,9 +12,9 @@ python:
   # - "pypy"
   # - "pypy-5.3.1"
 
-matrix:
-    allow_failures:
-        - python: 3.7-dev
+# matrix:
+#     allow_failures:
+#         - python: 3.7-dev
 
 # command to install dependencies
 before_install:
@@ -26,7 +26,6 @@ install:
   - python setup.py build sdist
   - pip install -r development.txt
   - pip install -U pip
-
 
 # command to run tests
 script: nosetests
