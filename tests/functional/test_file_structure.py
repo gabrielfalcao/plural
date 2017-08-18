@@ -72,7 +72,7 @@ def test_create_subject(context):
         docs1,
         docs2,
     })
-    list_file_tree(store.path).should.equal([
+    sorted(list_file_tree(store.path)).should.equal(sorted([
         u'Document/_ids/1c3b00da1c3b00da1c3b00da1c3b00da',
         u'Document/_ids/deadbeefdeadbeefdeadbeefdeadbeef',
         u'Document/_uuids/7fab47d1e50cfe3682a12acfce2f5208d619d5f6',
@@ -85,17 +85,17 @@ def test_create_subject(context):
         u'Document/indexes/uuid/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
         u'Document/objects/7fab47d1e50cfe3682a12acfce2f5208d619d5f6',
         u'Document/objects/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
-    ])
+    ]))
     store.delete(docs2)
     store.commit()
-    list_file_tree(store.path).should.equal([
+    sorted(list_file_tree(store.path)).should.equal(sorted([
         u'Document/_ids/deadbeefdeadbeefdeadbeefdeadbeef',
         u'Document/_uuids/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
         u'Document/indexes/content/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
         u'Document/indexes/title/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
         u'Document/indexes/uuid/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
         u'Document/objects/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
-    ])
+    ]))
 
 
 @with_hexastore('cms-bare', bare=True)
