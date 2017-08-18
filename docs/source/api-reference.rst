@@ -4,12 +4,24 @@
 API Reference
 =============
 
-Core
-----
+Store
+-----
 
 .. automodule:: gitgraph.store
    :members:
 
+
+Models
+------
+
+.. automodule:: gitgraph.models
+   :members:
+
+Codecs
+------
+
+.. automodule:: gitgraph.codec
+   :members:
 
 Query
 -----

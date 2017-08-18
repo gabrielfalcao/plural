@@ -38,8 +38,8 @@ class GitGraphStore(object):
 
     :param path: ``bytes`` - the path to the git repository ``string``
     :param bare: ``bool`` - manipulate git objects only
-    :param author_name: ``unicode`` - the name of the default git author, when not provided defaults to ``"hexastore"``
-    :param author_email: ``unicode`` - the email of the default git author, when not provided defaults to ``"hexastore@git"``
+    :param author_name: ``unicode`` - the name of the default git author.
+    :param author_email: ``unicode`` - the email of the default git author.
     """
     def __init__(self, path=None, bare=False,
                  author_name='hexastore',
@@ -67,7 +67,7 @@ class GitGraphStore(object):
         """serializes an object, meant for internal use only.
 
         :param obj: a hashable object
-        :return: ``string``
+        :returns: ``string``
         """
         return "\n".join([line.rstrip() for line in json.dumps(obj, sort_keys=True, indent=2).split('\n')])
 
@@ -75,21 +75,21 @@ class GitGraphStore(object):
         """deserialize a string into an object, meant for internal use only.
 
         :param string: a hashable object
-        :return: ``a hashable object``
+        :returns: ``a hashable object``
         """
         return json.loads(string)
 
     def iter_versions(self, branch='master'):
         """iterates over all the commits of the repo
         :param branch: the branch name
-        :return: an iterator of dictionaries with commit metadata
+        :returns: an iterator of dictionaries with commit metadata
         """
         for commit in self.repository.walk(self.repository.head.target, pygit2.GIT_SORT_TOPOLOGICAL):
             yield serialize_commit(commit)
 
     def get_versions(self, branch='master'):
         """same :py:meth:`as iter_versions` but returns a list
-        :return: a list
+        :returns: a list
         """
         results = list(self.iter_versions(branch))
         return results
@@ -100,7 +100,7 @@ class GitGraphStore(object):
         :param subject:
         :param predicate:
         :param data:
-        :return: ``bytes`` - the blob id
+        :returns: ``bytes`` - the blob id
         """
         subject = resolve_subject_name(subject)
         blob_id = self.repository.create_blob(data)
@@ -113,7 +113,7 @@ class GitGraphStore(object):
 
         :param subject: a string or a :py:class:`Subject` subclass reference
         :param ``**kw``: the field values
-        :return: an instance of the given subject
+        :returns: an instance of the given subject
 
         """
         predicate_ids = []
@@ -160,13 +160,17 @@ class GitGraphStore(object):
 
         return result
 
-    def merge(self, *nodes):
+    def merge(self, *nodes, **kw):
         """saves and commits all given nodes
 
         :param ``*nodes``: a list of subject instances
+        :param auto_commit: ``bool`` - default: ``True``
+        :returns: a list with the created nodes
         """
+        auto_commit = kw.pop('auto_commit', True)
         result = self.save_nodes(*nodes)
-        self.commit()
+        if auto_commit:
+            self.commit()
         return result
 
     def trace_path(self, entries):
@@ -176,22 +180,40 @@ class GitGraphStore(object):
         treeish = treeish or self.repository.index
         return filter(lambda entry: fnmatch(entry.path, pattern), treeish)
 
-    def scan_all(self, subject_name=None, treeish=None):
+    def scan_all(self, subject_name=None, treeish=None, pattern='*'):
+        """scans all nodes
+
+        :returns: a generator that produces :py:class:`Subject` instances with the scanned data
+        """
         subject_name = resolve_subject_name(subject_name)
         treeish = treeish or self.repository.index
-        pattern = os.path.join(subject_name, 'objects', '*')
+        pattern = os.path.join(subject_name, 'objects', pattern)
         for entry in self.glob(pattern):
             blob = self.repository[entry.oid]
             data = self.deserialize(blob.data)
             yield Subject.from_data(subject_name, **data)
 
-    def delete(self, *nodes):
+    def delete(self, *nodes, **kw):
+        """deletes and (optionally) commits all given nodes
+
+        :param ``*nodes``: a list of subject instances to be deleted
+        :param auto_commit: ``bool`` - default: ``False``
+        :returns: a list with the deleted nodes
+        """
+        auto_commit = kw.pop('auto_commit', False)
+        deleted = []
         for node in nodes:
             for path, oid in self.trace_path(self.glob('*{}*'.format(node.uuid))):
                 map(self.repository.index.remove, node.get_related_blob_paths(self.repository))
                 self.queries.append(
                     ' '.join(map(bytes, ['DELETE', node]))
                 )
+            deleted.append(node)
+
+        if auto_commit:
+            self.commit()
+
+        return nodes
 
     def get_subject_by_uuid(self, subject_name, uuid):
         """retrieves a subject by id

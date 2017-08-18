@@ -29,6 +29,7 @@ class Codec(object):  # pragma: no cover
 
 
 class Unicode(Codec):
+    """codec for UTF-8 encoded strings"""
     encoding = 'utf-8'
 
     def encode(self, string):
@@ -45,6 +46,7 @@ class Unicode(Codec):
 
 
 class DateTime(Codec):
+    """codec for datetime objects"""
     def encode(self, datetime):
         if not datetime:
             return ''
@@ -59,6 +61,7 @@ class DateTime(Codec):
 
 
 class Number(Codec):
+    """codec for Decimal objects"""
     def encode(self, number):
         if not number:
             return ''
@@ -72,6 +75,8 @@ class Number(Codec):
 
 
 class JSON(Codec):
+    """codec for JSON objects"""
+
     def encode(self, data):
         if not data:
             return ''
