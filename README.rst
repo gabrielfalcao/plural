@@ -1,8 +1,13 @@
 Plural - A git-backed graph library
 ======================================
 
+.. image:: docs/source/_static/logo.png
+
 .. image:: https://travis-ci.org/gabrielfalcao/plural.svg?branch=master
     :target: https://travis-ci.org/gabrielfalcao/plural
+
+
+
 
 Instalation
 -----------
