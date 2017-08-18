@@ -97,7 +97,7 @@ class Node(object):
     def encode_field(self, name, value):
         codec = self.__codecs__.get(name)
         if not codec:
-            return value
+            return value or ''
 
         return codec.encode(value)
 
