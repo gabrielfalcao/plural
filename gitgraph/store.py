@@ -20,7 +20,6 @@ import os
 import json
 import pygit2
 from uuid import uuid4
-from datetime import datetime
 from fnmatch import fnmatch
 
 from pygit2 import GIT_FILEMODE_BLOB
@@ -29,51 +28,9 @@ from pygit2 import init_repository
 from pygit2 import IndexEntry
 from pygit2 import Signature
 from gitgraph.models import Subject
+from gitgraph.models import resolve_subject_name
+from gitgraph.util import serialize_commit
 from gitgraph.meta import subject_has_index
-
-
-def resolve_subject_name(subj):
-    if isinstance(subj, type) and issubclass(subj, Subject):
-        return subj.__name__
-    elif subj is None:
-        return '*'
-    elif isinstance(subj, basestring):
-        return subj
-    else:
-        msg = (
-            'resolve_subject_name() takes a Subject subclass, '
-            'a string or None. Got {}'
-        )
-        raise TypeError(msg.format(repr(subj)))
-
-
-def resolve_subject(subj):
-    if isinstance(subj, type) and issubclass(subj, Subject):
-        return subj.__name__
-    elif isinstance(subj, basestring):
-        return subj
-    else:
-        msg = (
-            'resolve_subject() takes a Subject subclass or '
-            'a string. Got {}'
-        )
-        raise TypeError(msg.format(repr(subj)))
-
-
-def serialize_commit(commit):
-    data = {
-        'author': {
-            'name': commit.author.name,
-            'email': commit.author.email,
-        },
-        'committer': {
-            'name': commit.committer.name,
-            'email': commit.committer.email,
-        },
-        'message': commit.message,
-        'date': datetime.utcfromtimestamp(commit.commit_time),
-    }
-    return data
 
 
 class GitGraphStore(object):
@@ -84,15 +41,19 @@ class GitGraphStore(object):
     :param author_name: ``unicode`` - the name of the default git author, when not provided defaults to ``"hexastore"``
     :param author_email: ``unicode`` - the email of the default git author, when not provided defaults to ``"hexastore@git"``
     """
-    def __init__(self, path=None, bare=False, author_name='hexastore', author_email='hexastore@git'):
+    def __init__(self, path=None, bare=False,
+                 author_name='hexastore',
+                 author_email='hexastore@git',
+                 default_branch='refs/heads/master',
+                 repository=None):
         path = path or self.__class__.__name__.lower()
         self.path = path
         self.bare = bare
-        self.repository = init_repository(path, bare=bare)
+        self.repository = repository or init_repository(path, bare=bare)
         self.author = Signature(author_name, author_email)
         self.commiter = Signature(author_name, author_email)
         self.queries = []
-        self.default_branch = 'refs/heads/master'
+        self.default_branch = default_branch
 
     def add_remote(self, name, url):
         """adds a remote repository
@@ -141,6 +102,7 @@ class GitGraphStore(object):
         :param data:
         :return: ``bytes`` - the blob id
         """
+        subject = resolve_subject_name(subject)
         blob_id = self.repository.create_blob(data)
         entry = IndexEntry(os.path.join(subject, predicate), blob_id, GIT_FILEMODE_BLOB)
         self.repository.index.add(entry)
@@ -154,17 +116,20 @@ class GitGraphStore(object):
         :return: an instance of the given subject
 
         """
-        subject = resolve_subject(subject)
+        predicate_ids = []
+
+        subject = resolve_subject_name(subject)
         subject_uuid = obj.get('uuid', uuid4().hex)
 
         subject_data = self.serialize(obj)
         object_hash = bytes(pygit2.hash(subject_data))
-        self.add_spo(os.path.join(subject, 'objects'), object_hash, subject_data)
+        object_path = os.path.join(subject, 'objects')
+        id_path = os.path.join(subject, '_ids')
+        uuid_path = os.path.join(subject, '_uuids')
 
-        predicate_ids = []
-
-        self.add_spo(os.path.join(subject, '_ids'), subject_uuid, object_hash)
-        self.add_spo(os.path.join(subject, '_uuids'), object_hash, subject_uuid)
+        self.add_spo(object_path, object_hash, subject_data)
+        self.add_spo(id_path, subject_uuid, object_hash)
+        self.add_spo(uuid_path, object_hash, subject_uuid)
 
         indexes = {}
         for key in obj.keys():
@@ -174,12 +139,10 @@ class GitGraphStore(object):
 
             predicate_ids.append(self.add_spo(os.path.join(subject, 'indexes', key), object_hash, value))
 
-        node = Subject.from_data(subject, **obj)
-
         self.queries.append(
-            ' '.join(map(bytes, ['CREATE', node]))
+            ' '.join(map(bytes, ['CREATE', subject, subject_uuid]))
         )
-        return node
+        return Subject.from_data(subject, **obj)
 
     def save_nodes(self, *nodes):
         """creates staged entries for all the given subject nodes, regardless of type
@@ -187,16 +150,21 @@ class GitGraphStore(object):
         :param ``*nodes``: a list of subject instances
         """
 
+        result = []
         for node in nodes:
-            self.create(node.__class__.__name__, **node.to_dict())
+            n = self.create(node.__class__.__name__, **node.to_dict())
+            result.append(n)
+
+        return result
 
     def merge(self, *nodes):
         """saves and commits all given nodes
 
         :param ``*nodes``: a list of subject instances
         """
-        self.save_nodes(*nodes)
+        result = self.save_nodes(*nodes)
         self.commit()
+        return result
 
     def trace_path(self, entries):
         return map(lambda entry: (entry.path, bytes(entry.oid)), entries)

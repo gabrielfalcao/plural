@@ -80,10 +80,14 @@ def test_subject_from_dict_get_attribute():
     foobar.should.have.property('name').being.equal('Foo Bar')
     foobar.should.have.property('birthdate').being.equal('1973/07/04')
     foobar.should.have.property('uuid').being.equal('woot')
+    hash(foobar).should.equal(6193599141153582213)
     hasattr(foobar, '__invalid__').should.be.false
     hasattr(foobar, 'invalid').should.be.false
 
     foobar.to_json().should.equal(json.dumps(foobar.to_dict()))
+    bytes(foobar).should.match('^Person[{]')
+    repr(foobar).should.match('^Person[{]')
+    foobar.should.equal(foobar)
 
 
 def test_subject_has_index():

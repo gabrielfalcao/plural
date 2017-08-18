@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gitgraph.store import resolve_subject_name
-from gitgraph.store import resolve_subject
+from gitgraph.models import resolve_subject_name
+from gitgraph.models import resolve_subject
 from gitgraph.store import serialize_commit
 from gitgraph.store import GitGraphStore
 from gitgraph.models import Subject

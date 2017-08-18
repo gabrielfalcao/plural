@@ -32,3 +32,7 @@ release:
 	@./.release
 	@python setup.py build sdist
 	@twine upload dist/*.tar.gz
+
+
+numbers:
+	@python nums.py

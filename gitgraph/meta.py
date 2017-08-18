@@ -15,8 +15,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import json
 from collections import OrderedDict
 from gitgraph.exceptions import InvalidSubjectDefinition
+from gitgraph.util import generate_uuid
 
 
 SUBJECTS = OrderedDict()
@@ -45,6 +47,49 @@ def validate_subject_definition(name, cls, members):
     return indexes
 
 
+class Node(object):
+    """baseclass of Subject, exists solely for meta-programming purposes"""
+
+    def __init__(self, uuid=None, **kw):
+        self.uuid = kw.get('uuid', uuid)
+        self.__data__ = kw
+        self.__data__['uuid'] = uuid or generate_uuid()
+
+    def __setitem__(self, key, value):
+        self.__data__[key] = value
+
+    def __contains__(self, key):
+        return key in self.__data__
+
+    def __getitem__(self, key):
+        return self.__data__[key]
+
+    def __setattr__(self, key, value):
+        if key in self.__fields__:
+            self.__data__[key] = value
+        else:
+            object.__setattr__(self, key, value)
+
+    def __getattr__(self, key):
+        if key.startswith('__'):
+            return super(Node, self).__getattribute__(key)
+
+        if key not in self.__data__:
+            raise AttributeError('key not found: {}'.format(key))
+
+        return self.__data__[key]
+
+    def to_dict(self):
+        return self.__data__.copy()
+
+    def to_json(self, **kw):
+        return json.dumps(self.to_dict(), **kw)
+
+
+def is_node_subclass(cls):
+    return isinstance(cls, type) and issubclass(cls, Node) and cls is not Node and not cls.__module__.startswith('gitgraph.')
+
+
 class MetaSubject(type):
     def __init__(cls, name, bases, members):
         indexes = set()
@@ -54,7 +99,13 @@ class MetaSubject(type):
             SUBJECTS_BY_CLASS[cls] = name
             indexes = validate_subject_definition(name, cls, members)
 
-        fields = {'uuid'}.union(indexes)
-        cls.__fields__ = fields
+        fields = set(indexes)
+
+        for parent in filter(is_node_subclass, bases):
+            parent_indexes = getattr(parent, 'indexes', set())
+            fields = fields.union(set(parent_indexes))
+
+        cls.indexes = fields
+        cls.__fields__ = {'uuid'}.union(fields)
         cls.__data__ = {}
         super(MetaSubject, cls).__init__(name, bases, members)

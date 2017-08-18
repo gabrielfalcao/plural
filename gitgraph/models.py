@@ -16,10 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import json
 from hashlib import sha256
-from gitgraph.util import generate_uuid
 from gitgraph.meta import MetaSubject
+from gitgraph.meta import Node
 from gitgraph.meta import SUBJECTS
 
 from gitgraph.exceptions import SubjectDefinitionNotFound
@@ -51,43 +50,6 @@ def resolve_subject(subj):
             'a string. Got {}'
         )
         raise TypeError(msg.format(repr(subj)))
-
-
-class Node(object):
-    def __init__(self, uuid=None, **kw):
-        self.uuid = kw.get('uuid', uuid)
-        self.__data__ = kw
-        self.__data__['uuid'] = uuid or generate_uuid()
-
-    def __setitem__(self, key, value):
-        self.__data__[key] = value
-
-    def __contains__(self, key):
-        return key in self.__data__
-
-    def __getitem__(self, key):
-        return self.__data__[key]
-
-    def __setattr__(self, key, value):
-        if key in self.__fields__:
-            self.__data__[key] = value
-        else:
-            object.__setattr__(self, key, value)
-
-    def __getattr__(self, key):
-        if key.startswith('__'):
-            return super(Node, self).__getattribute__(key)
-
-        if key not in self.__data__:
-            raise AttributeError('key not found: {}'.format(key))
-
-        return self.__data__[key]
-
-    def to_dict(self):
-        return self.__data__.copy()
-
-    def to_json(self, **kw):
-        return json.dumps(self.to_dict(), **kw)
 
 
 class Subject(Node):
