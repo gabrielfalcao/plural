@@ -26,7 +26,7 @@ from pygit2 import GIT_RESET_HARD
 from pygit2 import init_repository
 from pygit2 import IndexEntry
 from pygit2 import Signature
-from plural.meta import subject_has_index
+from plural.models.meta.edges import subject_has_index
 from plural.models.edges import Subject
 from plural.models.edges import resolve_subject_name
 from plural.util import generate_uuid

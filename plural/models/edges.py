@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from plural.meta import MetaSubject
-from plural.meta import SUBJECTS
+from plural.models.meta.edges import MetaSubject
+from plural.models.meta.edges import SUBJECTS
 from plural.models.element import Element
 
 from plural.exceptions import SubjectDefinitionNotFound

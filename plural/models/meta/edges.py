@@ -26,10 +26,6 @@ SUBJECTS = OrderedDict()
 SUBJECTS_BY_CLASS = OrderedDict()
 SUBJECT_VERTEXES = defaultdict(OrderedDict)
 
-VERTEXES = OrderedDict()
-VERTEXES_BY_CLASS = OrderedDict()
-VERTEXES = OrderedDict
-
 
 def subject_has_index(name, key):
     if name not in SUBJECTS:
