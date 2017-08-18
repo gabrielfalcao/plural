@@ -19,7 +19,7 @@ python:
 # command to install dependencies
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y bash build-essential ca-certificates curl cmake libffi-dev pkg-config python-pip python2.7-dev
+  - sudo apt-get install -y bash make build-essential ca-certificates curl cmake libffi-dev pkg-config python-pip python2.7-dev
 
 install:
   - bash install-libgit2.sh
@@ -28,7 +28,7 @@ install:
   - pip install -U pip
 
 # command to run tests
-script: nosetests
+script: make
 
 # automated pypi releases
 deploy:
