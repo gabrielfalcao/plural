@@ -12,8 +12,8 @@ if [ ! -e "${folder}" ]; then
 fi
 
 cd "${folder}" || echo
-cmake . -DCMAKE_INSTALL_PREFIX="${LIBGIT2}"
+cmake .
 make
-make install
+sudo make install
 sudo ldconfig
 pip install "pygit2==${LIBGIT2_VERSION}"
