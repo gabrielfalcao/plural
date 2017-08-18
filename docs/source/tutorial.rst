@@ -70,7 +70,7 @@ Create
     uuid2 = docs2.uuid
 
 
-Retrieve
+Querying
 --------
 
 One By UUID
@@ -131,4 +131,11 @@ Delete
 .. code:: python
 
     store.delete(docs1)
+    store.commit()
+
+or
+
+.. code:: python
+
+    store.delete(docs1, auto_commit=True)
     store.commit()
