@@ -14,13 +14,13 @@ def test_create_edge(context):
     uuid2 = '1c3b00da1c3b00da1c3b00da1c3b00da'
 
     # Edge can be created
-    docs1 = store.create(
+    docs1 = store.create_edge(
         'Document',
         uuid=uuid1,
         title='Essay',
         content='content1',
     )
-    docs2 = store.create(
+    docs2 = store.create_edge(
         Document,
         uuid=uuid2,
         title='Blog',
@@ -32,13 +32,13 @@ def test_create_edge(context):
     store.delete(docs1)
     store.commit()
     store.merge(docs1, docs2)
-    docs1 = store.create(
+    docs1 = store.create_edge(
         'Document',
         uuid=uuid1,
         title='Essay',
         content='content1',
     )
-    docs2 = store.create(
+    docs2 = store.create_edge(
         'Document',
         uuid=uuid2,
         title='Blog',
@@ -106,13 +106,13 @@ def test_bare(context):
     uuid2 = '1c3b00da1c3b00da1c3b00da1c3b00da'
 
     # Edge can be created
-    docs1 = store.create(
+    docs1 = store.create_edge(
         'Document',
         uuid=uuid1,
         title='Essay',
         content='content1',
     )
-    docs2 = store.create(
+    docs2 = store.create_edge(
         Document,
         uuid=uuid2,
         title='Blog',
@@ -124,13 +124,13 @@ def test_bare(context):
     store.delete(docs1)
     store.commit()
     store.merge(docs1, docs2)
-    docs1 = store.create(
+    docs1 = store.create_edge(
         'Document',
         uuid=uuid1,
         title='Essay',
         content='content1',
     )
-    docs2 = store.create(
+    docs2 = store.create_edge(
         'Document',
         uuid=uuid2,
         title='Blog',

@@ -51,7 +51,7 @@ Create
     uuid1 = 'deadbeefdeadbeefdeadbeefdeadbeef'
 
     # providing your own uuid
-    docs1 = store.create(
+    docs1 = store.create_edge(
         'Document',
         uuid=uuid1,
         title='Essay',
@@ -59,7 +59,7 @@ Create
     )
 
     # auto-generated uuid
-    docs2 = store.create(
+    docs2 = store.create_edge(
         Document,
         title='Blog',
         body='body2',
@@ -116,7 +116,7 @@ Update
     store.merge(docs1, docs2)
 
     # recreate the doc1
-    docs1 = store.create(
+    docs1 = store.create_edge(
         Document,
         uuid=uuid1,
         title='Essay',

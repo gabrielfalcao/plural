@@ -27,10 +27,16 @@ from pygit2 import init_repository
 from pygit2 import IndexEntry
 from pygit2 import Signature
 from plural.models.meta.edges import edge_has_index
+from plural.models.meta.vertexes import vertex_has_index
+from plural.models.meta.edges import is_edge_subclass
+from plural.models.meta.vertexes import is_vertex_subclass
 from plural.models.edges import Edge
+from plural.models.vertexes import Vertex
 from plural.models.edges import resolve_edge_name
+from plural.models.vertexes import resolve_vertex_name
 from plural.util import generate_uuid
 from plural.util import serialize_commit
+from plural.util import AutoCodec
 
 
 class PluralStore(object):
@@ -69,7 +75,8 @@ class PluralStore(object):
         :param obj: a hashable object
         :returns: ``string``
         """
-        return "\n".join([line.rstrip() for line in json.dumps(obj, sort_keys=True, indent=2).split('\n')])
+        default = AutoCodec().encode
+        return "\n".join([line.rstrip() for line in json.dumps(obj, sort_keys=True, indent=2, default=default).split('\n')])
 
     def deserialize(self, string):
         """deserialize a string into an object, meant for internal use only.
@@ -108,7 +115,57 @@ class PluralStore(object):
         self.repository.index.add(entry)
         return blob_id
 
-    def create(self, edge, **obj):
+    def create(self, element, **obj):
+        if is_edge_subclass(element):
+            new = self.create_edge(element, **obj)
+            self.queries.append(
+                ' '.join(map(bytes, ['CREATE EDGE', repr(new)]))
+            )
+            return new
+        elif is_vertex_subclass(element):
+            new = self.create_vertex(element, **obj)
+            self.queries.append(
+                ' '.join(map(bytes, ['CREATE VERTEX', repr(new)]))
+            )
+            return new
+
+    def create_vertex(self, vertex, **obj):
+        """creates a staged vertex entry including its indexed fields.
+
+        :param vertex: a string or a :py:class:`Vertex` subclass reference
+        :param ``**kw``: the field values
+        :returns: an instance of the given vertex
+
+        """
+        vertex = resolve_vertex_name(vertex)
+        predicate_ids = []
+
+        vertex_uuid = obj.pop('uuid', generate_uuid())
+        obj['uuid'] = vertex_uuid
+
+        vertex_data = self.serialize(obj)
+        object_hash = bytes(pygit2.hash(vertex_data))
+        object_path = os.path.join(vertex, 'objects')
+
+        id_path = os.path.join(vertex, '_ids')
+        uuid_path = os.path.join(vertex, '_uuids')
+
+        indexes = {}
+        for key in obj.keys():
+            value = obj.get(key, None)
+            if vertex_has_index(vertex, key):
+                indexes[key] = value
+
+            predicate_path = os.path.join(vertex, 'indexes', key)
+            predicate_ids.append(self.add_spo(predicate_path, object_hash, value))
+
+        self.add_spo(object_path, object_hash, vertex_data)
+        self.add_spo(id_path, vertex_uuid, object_hash)
+        self.add_spo(uuid_path, object_hash, vertex_uuid)
+
+        return Vertex.from_data(vertex, **obj)
+
+    def create_edge(self, edge, **obj):
         """creates a staged edge entry including its indexed fields.
 
         :param edge: a string or a :py:class:`Edge` subclass reference
@@ -142,9 +199,6 @@ class PluralStore(object):
         self.add_spo(id_path, edge_uuid, object_hash)
         self.add_spo(uuid_path, object_hash, edge_uuid)
 
-        self.queries.append(
-            ' '.join(map(bytes, ['CREATE', edge, edge_uuid]))
-        )
         return Edge.from_data(edge, **obj)
 
     def save_nodes(self, *nodes):
@@ -155,7 +209,7 @@ class PluralStore(object):
 
         result = []
         for node in nodes:
-            n = self.create(node.__class__.__name__, **node.to_dict())
+            n = self.create_edge(node.__class__.__name__, **node.to_dict())
             result.append(n)
 
         return result

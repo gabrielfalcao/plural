@@ -15,29 +15,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import json
-# from time import mktime
-from decimal import Decimal
-from datetime import datetime, date, time
+from collections import OrderedDict
 from hashlib import sha256
 from plural.util import generate_uuid
-
-
-class AutoCodec(object):
-    def decode(self, obj):
-        return obj
-
-    def encode(self, obj):
-        if isinstance(obj, (datetime, date, time)):
-            return obj.isoformat()
-
-        if isinstance(obj, (Decimal)):
-            return bytes(obj)
-
-        if obj is None:
-            return b''
-
-        return obj
+from plural.util import AutoCodec
 
 
 class Element(object):
@@ -45,7 +28,7 @@ class Element(object):
 
     def __init__(self, uuid=None, **kw):
         self.uuid = kw.get('uuid', uuid)
-        self.__data__ = dict([(k, self.decode_field(k, v)) for k, v in kw.items()])
+        self.__data__ = OrderedDict([(k, self.decode_field(k, v)) for k, v in kw.items()])
         self.__data__['uuid'] = uuid or generate_uuid()
 
     def __setitem__(self, key, value):
@@ -59,13 +42,16 @@ class Element(object):
         return self.decode_field(key, value)
 
     def __setattr__(self, key, value):
+        if key.startswith('_'):
+            return object.__setattr__(self, key, value)
+
         if key in self.__fields__:
             self.__data__[key] = self.encode_field(key, value)
         else:
             object.__setattr__(self, key, value)
 
     def __getattr__(self, key):
-        if key.startswith('__'):
+        if key.startswith('_'):
             return super(Element, self).__getattribute__(key)
 
         if key not in self.__data__:
@@ -106,3 +92,26 @@ class Element(object):
 
     def __eq__(self, other):
         return isinstance(other, Element) and self.to_dict() == other.to_dict()
+
+    @classmethod
+    def from_data(cls, ___name___=None, **kw):
+        """
+        creates a new instance of the given :py:class:`Element` with the provided ``**kwargs``
+
+        :param ___name___: the name of the element type
+        :param ``**kw``: a dictionary
+        :returns: an instance of the given :py:class:`Element` subclass
+        """
+        name = ___name___ or cls.__name__
+        Definition = cls.definition(name)
+        return Definition(**kw)
+
+    @classmethod
+    def from_dict(Definition, data):
+        """
+        creates a new instance of the given :py:class:`Element` with the provided ``data``
+
+        :param data: a dictionary
+        :returns: an instance of the given :py:class:`Element` subclass
+        """
+        return Definition(**data)

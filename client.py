@@ -26,7 +26,7 @@ class GraphClient(object):
     def __init__(self, request_connect_addr='tcp://127.0.0.1:6000'):
         self.context = zmq.Context()
         self.sockets = SocketManager(zmq, self.context)
-        self.sockets.create('query', zmq.REQ)
+        self.sockets.create_edge('query', zmq.REQ)
 
     def request(self, data):
         self.sockets.send_safe('query', data)

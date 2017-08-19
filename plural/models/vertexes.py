@@ -65,8 +65,8 @@ class Vertex(Element):
     __metaclass__ = MetaVertex
 
     def __init__(self, origin, target, *args, **kw):
-        self.origin = origin
-        self.target = target
+        self._origin = origin
+        self._target = target
         super(Vertex, self).__init__(*args, **kw)
 
     @staticmethod

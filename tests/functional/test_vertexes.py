@@ -4,7 +4,7 @@ from decimal import Decimal
 from tests.functional.scenarios import with_hexastore
 from tests.edges import Car, Person
 from tests.vertexes import CarPurchase
-from tests.vertexes import CarSales
+from tests.vertexes import CarSale
 
 
 @with_hexastore('vehicles')
@@ -22,7 +22,7 @@ def test_codecs_from_string(context):
         payment_sent_at='2017/08/18 16:20:00',
     )
 
-    sold_by_elon = CarSales(
+    sold_by_elon = CarSale(
         uuid='76543210765432107654321076543210',
         origin=elon,
         target=tesla,
@@ -63,7 +63,7 @@ def test_codecs_from_native_types(context):
         price=Decimal('58314.15'),
     )
 
-    sold_by_elon = CarSales(
+    sold_by_elon = CarSale(
         uuid='76543210765432107654321076543210',
         origin=elon,
         target=tesla,
@@ -106,7 +106,7 @@ def test_codecs_null_fields(context):
         price=None,
     )
 
-    sold_by_elon = CarSales(
+    sold_by_elon = CarSale(
         uuid='76543210765432107654321076543210',
         origin=elon,
         target=tesla,

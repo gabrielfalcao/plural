@@ -18,8 +18,10 @@
 from plural import Edge
 from plural import codec
 
+from tests.vertexes import AuthoredDocument
+from tests.vertexes import TaggedDocument
 from tests.vertexes import CarPurchase
-from tests.vertexes import CarSales
+from tests.vertexes import CarSale
 from tests.vertexes import CarDeal
 from plural.models.meta.vertexes import outgoing_vertex
 from plural.models.meta.vertexes import indirect_vertex
@@ -57,7 +59,7 @@ class Car(Vehicle):
     }
 
     vertexes = [
-        incoming_vertex('sold_by', 'Person').through(CarSales),
+        incoming_vertex('sold_by', 'Person').through(CarSale),
         outgoing_vertex('bought_by', 'Person').through(CarPurchase),
         indirect_vertex('deal', 'Car').through(CarDeal),
     ]
@@ -83,11 +85,7 @@ class Document(Edge):
         'title': codec.Unicode,
     }
 
-    authored_by = Author.v.incoming({
-        'created_at': codec.DateTime,
-        'modified_at': codec.DateTime,
-    }, 'documents')
-
-    tagged_by = Tag.v.outgoing([
-        ('created_at', codec.DateTime),
-    ], 'documents')
+    vertexes = [
+        incoming_vertex('authored_by', Author).through(AuthoredDocument),
+        outgoing_vertex('tagged_by', Tag).through(TaggedDocument),
+    ]

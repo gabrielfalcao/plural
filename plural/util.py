@@ -17,7 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from uuid import uuid4
-from datetime import datetime
+# from time import mktime
+from decimal import Decimal
+from datetime import datetime, date, time
 
 
 def generate_uuid():
@@ -38,3 +40,23 @@ def serialize_commit(commit):
         'date': datetime.utcfromtimestamp(float(commit.commit_time)),
     }
     return data
+
+
+class AutoCodec(object):
+    def decode(self, obj):
+        return obj
+
+    def encode(self, obj):
+        if isinstance(obj, (datetime, date, time)):
+            return obj.isoformat()
+
+        if isinstance(obj, (Decimal)):
+            return bytes(obj)
+
+        if callable(getattr(obj, 'to_dict', None)):
+            return obj.to_dict()
+
+        if obj is None:
+            return b''
+
+        return obj

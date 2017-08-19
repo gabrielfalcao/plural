@@ -28,7 +28,7 @@ class CarPurchase(IncomingVertex):
     }
 
 
-class CarSales(OutgoingVertex):
+class CarSale(OutgoingVertex):
     indexes = {'contract_signed_at', 'payment_received_at'}
     fields = {
         'contract_signed_at': codec.DateTime,
@@ -40,4 +40,19 @@ class CarDeal(OutgoingVertex):
     indexes = {'delivered_at'}
     fields = {
         'delivered_at': codec.DateTime,
+    }
+
+
+class AuthoredDocument(IncomingVertex):
+    indexes = {'created_at', 'modified_at'}
+    fields = {
+        'created_at': codec.DateTime,
+        'modified_at': codec.DateTime,
+    }
+
+
+class TaggedDocument(OutgoingVertex):
+    indexes = {'created_at'}
+    fields = {
+        'created_at': codec.DateTime,
     }

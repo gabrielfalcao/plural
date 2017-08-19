@@ -20,6 +20,9 @@ from mock import patch, call, MagicMock
 
 from plural.store import PluralStore
 from tests.edges import Car
+from tests.edges import Person
+from tests.vertexes import CarPurchase
+from tests.vertexes import CarSale
 from .scenarios import with_graph_store
 
 
@@ -146,39 +149,9 @@ def test_add_spo(context, IndexEntry):
 
 
 @with_graph_store('/path/to/folder')
-@patch('plural.store.pygit2.hash')
-@patch('plural.store.PluralStore.add_spo')
-def test_create(context, add_spo, git_object_hash):
-    ('PluralStore.create() should add spos for its indexes')
-
-    git_object_hash.return_value = 'git-object-hash'
-    data = {
-        'uuid': 'generated-uuid4',
-        'max_speed': '160.4',
-        'brand': 'Tesla',
-        'model': 'Model S',
-        'nickname': 'Lightning'
-    }
-    tesla = context.store.create(Car, **data)
-    tesla.should.be.a(Car)
-    tesla.to_dict().should.be.a(dict)
-
-    add_spo.assert_has_calls([
-        call('Car/indexes/model', 'git-object-hash', 'Model S'),
-        call('Car/indexes/max_speed', 'git-object-hash', '160.4'),
-        call('Car/indexes/nickname', 'git-object-hash', 'Lightning'),
-        call('Car/indexes/brand', 'git-object-hash', 'Tesla'),
-        call('Car/indexes/uuid', 'git-object-hash', 'generated-uuid4'),
-        call('Car/objects', 'git-object-hash', '{\n  "brand": "Tesla",\n  "max_speed": "160.4",\n  "model": "Model S",\n  "nickname": "Lightning",\n  "uuid": "generated-uuid4"\n}'),
-        call('Car/_ids', 'generated-uuid4', 'git-object-hash'),
-        call('Car/_uuids', 'git-object-hash', 'generated-uuid4')
-    ])
-
-
-@with_graph_store('/path/to/folder')
-@patch('plural.store.PluralStore.create')
+@patch('plural.store.PluralStore.create_edge')
 def test_save_nodes(context, create):
-    ('PluralStore.save_nodes() should .create() each given node ')
+    ('PluralStore.save_nodes() should .create_edge() each given node ')
     create.side_effect = lambda name, **data: 'mock-{}'.format(name.lower())
     car1 = Car(uuid='uuid1', brand='Ferrari', model='F1')
     car2 = Car(uuid='uuid2', brand='Tesla', model='Model S')
@@ -210,3 +183,97 @@ def test_merge(context, commit, save_nodes):
 
     save_nodes.assert_called_once_with(car1, car2)
     commit.assert_called_once_with()
+
+
+@with_graph_store('/path/to/folder')
+@patch('plural.store.pygit2.hash')
+@patch('plural.store.PluralStore.add_spo')
+def test_create_edge(context, add_spo, git_object_hash):
+    ('PluralStore.create_edge() should add spos for its indexes')
+
+    git_object_hash.return_value = 'git-object-hash'
+    data = {
+        'uuid': 'generated-uuid4',
+        'max_speed': '160.4',
+        'brand': 'Tesla',
+        'model': 'Model S',
+        'nickname': 'Lightning'
+    }
+    tesla = context.store.create_edge(Car, **data)
+    tesla.should.be.a(Car)
+    tesla.to_dict().should.be.a(dict)
+
+    add_spo.assert_has_calls([
+        call('Car/indexes/model', 'git-object-hash', 'Model S'),
+        call('Car/indexes/max_speed', 'git-object-hash', '160.4'),
+        call('Car/indexes/nickname', 'git-object-hash', 'Lightning'),
+        call('Car/indexes/brand', 'git-object-hash', 'Tesla'),
+        call('Car/indexes/uuid', 'git-object-hash', 'generated-uuid4'),
+        call('Car/objects', 'git-object-hash', '{\n  "brand": "Tesla",\n  "max_speed": "160.4",\n  "model": "Model S",\n  "nickname": "Lightning",\n  "uuid": "generated-uuid4"\n}'),
+        call('Car/_ids', 'generated-uuid4', 'git-object-hash'),
+        call('Car/_uuids', 'git-object-hash', 'generated-uuid4'),
+    ])
+
+
+# @with_graph_store('/path/to/folder')
+# @patch('plural.store.pygit2.hash')
+# @patch('plural.store.PluralStore.add_spo')
+# def test_create_vertex_incoming(context, add_spo, git_object_hash):
+#     ('PluralStore.create_vertex() should add spos for its indexes')
+
+#     git_object_hash.return_value = 'git-object-hash'
+#     tesla = Car(uuid='car-uuid', brand='Tesla')
+#     chuck = Person(uuid='chuck-uuid', name='Chuck Norris')
+
+#     purchase = context.store.create_vertex(
+#         CarPurchase,
+#         uuid='purchase-uuid',
+#         origin=chuck,
+#         target=tesla,
+#         contract_signed_at='2017-08-18 00:31:45',
+#         payment_sent_at='2017-07-04 15:25:35',
+#     )
+#     purchase.should.be.a(CarPurchase)
+#     purchase.to_dict().should.be.a(dict)
+
+#     add_spo.assert_has_calls([
+#         call('CarPurchase/_ids', 'purchase-uuid', 'git-object-hash'),
+#         call('CarPurchase/_uuids', 'git-object-hash', 'purchase-uuid'),
+#         call('CarPurchase/indexes/contract_signed_at', 'git-object-hash', 'contract-signed-at'),
+#         call('CarPurchase/indexes/payment_sent_at', 'git-object-hash', 'payment-sent-at'),
+#         call('CarPurchase/indexes/uuid', 'git-object-hash', 'purchase-uuid'),
+#         call('vertices/bought_by/_uuids', 'chuck-uuid', purchase.to_json()),
+#     ])
+
+
+# @with_graph_store('/path/to/folder')
+# @patch('plural.store.pygit2.hash')
+# @patch('plural.store.PluralStore.add_spo')
+# def test_create_vertex_outgoing(context, add_spo, git_object_hash):
+#     ('PluralStore.create_vertex() should add spos for its indexes')
+
+#     git_object_hash.return_value = 'git-object-hash'
+#     tesla = Car(uuid='car-uuid', brand='Tesla')
+#     elon = Person(uuid='elon-uuid', name='Elon Musk')
+
+#     sale = context.store.create_vertex(
+#         CarSale,
+#         uuid='sales-uuid',
+#         origin=elon,
+#         target=tesla,
+#         contract_signed_at='2017-08-18 00:31:45',
+#         payment_received_at='2017-07-04 15:25:35',
+#     )
+
+#     sale.should.be.a(CarSale)
+#     sale.to_dict().should.be.a(dict)
+
+#     add_spo.assert_has_calls([
+#         call('Car/outgoing/sold_by/Person', 'uuid', 'elon-uuid'),
+#         call('CarSale/indexes/contract_signed_at', 'git-object-hash', 'contract-signed-at'),
+#         call('CarSale/indexes/payment_sent_at', 'git-object-hash', 'payment-sent-at'),
+#         call('CarSale/indexes/uuid', 'git-object-hash', 'sale-uuid'),
+#         call('CarSale/objects', 'git-object-hash', sale.to_json()),
+#         call('CarSale/_ids', 'sale-uuid', 'git-object-hash'),
+#         call('CarSale/_uuids', 'git-object-hash', 'sale-uuid')
+#     ])
