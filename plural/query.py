@@ -34,7 +34,7 @@ class Query(object):
 
 
 class predicate(Query):
-    """creates matchers for predicates of subjects
+    """creates matchers for predicates of edges
     """
 
     def construct(self, name):

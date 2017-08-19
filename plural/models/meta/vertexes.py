@@ -17,13 +17,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from plural.models.element import Element
 from plural.exceptions import InvalidVertexDefinition
 
 
 VERTEXES = OrderedDict()
 VERTEXES_BY_CLASS = OrderedDict()
-VERTEXES = OrderedDict
 
 
 def vertex_has_index(name, key):
@@ -39,68 +37,15 @@ def get_attribute_from_meta_child(attribute, cls, members):
 
 
 def validate_vertex_definition(name, cls, members):
-    indexes = get_attribute_from_meta_child('indexes', cls, members)
-    if not indexes:
-        raise InvalidVertexDefinition('the {} definition should have at least one index'.format(cls))
+    indexes = get_attribute_from_meta_child('indexes', cls, members) or set()
     if not isinstance(indexes, (set, list, tuple)):
         raise InvalidVertexDefinition('the {} definition has an index property that is not a set, list or tuple: {}'.format(cls, type(indexes)))
 
     return indexes
 
 
-class Vertex(object):
-    def __init__(self, target, attributes, reverse_label=None):
-        self.origin = None
-        self.target = target
-        self.codecs = attributes
-        self.reverse_label = None
-
-    def attach_origin(self, origin):
-        self.origin = origin
-        VERTEX_VERTEXES[self.origin][self.direction] = self
-        if not self.reverse_label:
-            origin_name = origin.__name__.lower()
-            self.reverse_label = "{}s".format(origin_name)
-
-    def is_attached(self):
-        return is_node_subclass(self.origin)
-
-
-class IncomingVertex(Vertex):
-    """represents a vertex coming from the origin into the target
-    (O)-[v]->(T)
-    """
-    direction = 'incoming'
-
-
-class OutgoingVertex(Vertex):
-    """represents a vertex going out the target into the origin
-    (O)<-[v]-(T)
-
-    """
-    direction = 'outgoing'
-
-
-class IndirectVertex(Vertex):
-    """represents a vertex that connects two edges without direction
-    (O)-[v]-(T)
-    """
-    direction = 'indirect'
-
-
-class VertexFactory(object):
-    def __init__(self, vertex):
-        self.target = vertex
-
-    def incoming(self, attributes=None, reverse_label=None):
-        return IncomingVertex(self.target, attributes=dict(attributes or {}), reverse_label=reverse_label)
-
-    def outgoing(self, attributes=None, reverse_label=None):
-        return OutgoingVertex(self.target, attributes=dict(attributes or {}), reverse_label=reverse_label)
-
-
-def is_node_subclass(cls):
-    return isinstance(cls, type) and issubclass(cls, Element) and cls is not Element and not cls.__module__.startswith('plural.')
+def is_vertex_subclass(cls):
+    return isinstance(cls, type) and issubclass(cls, MetaVertex.Target) and cls is not MetaVertex.Target and not cls.__module__.startswith('plural.')
 
 
 class MetaVertex(type):
@@ -108,14 +53,23 @@ class MetaVertex(type):
         indexes = set()
         codecs = {}
 
-        if name not in ('MetaVertex', 'Vertex') and cls.__module__ != __name__:
+        if name == 'Vertex':  # and cls.__module__.startswith('plural.models.vertexes'):
+            MetaVertex.Target = cls
+            super(MetaVertex, cls).__init__(name, bases, members)
+            return
+
+        if name == 'MetaVertex':  # and cls.__module__.startswith('plural.models.vertexes'):
+            super(MetaVertex, cls).__init__(name, bases, members)
+            return
+
+        if name not in ('MetaVertex', 'Vertex') and not cls.__module__.startswith('plural.models.vertexes'):
             VERTEXES[name] = cls
             VERTEXES_BY_CLASS[cls] = name
             indexes = validate_vertex_definition(name, cls, members)
 
         fields = set(indexes)
 
-        for parent in filter(is_node_subclass, bases):
+        for parent in filter(is_vertex_subclass, bases):
             parent_indexes = getattr(parent, 'indexes', set())
             fields = fields.union(set(parent_indexes))
 
@@ -124,8 +78,52 @@ class MetaVertex(type):
 
         codecs.update(getattr(cls, 'fields', {}))
         cls.indexes = fields
-        cls.v = VertexFactory(cls)
         cls.__fields__ = {'uuid'}.union(fields)
         cls.__data__ = {}
         cls.__codecs__ = dict([(n, Codec()) for n, Codec in codecs.items()])
         super(MetaVertex, cls).__init__(name, bases, members)
+
+
+class VertexDefinition(object):
+    def __init__(self, label, edge, through=None, fields=None):
+        self._label = label
+        self._origin = edge
+        self._through = through
+        self._fields = fields
+
+    def through(self, edge):
+        self._through = edge
+        return self
+
+    def with_fields(self, edge):
+        self._fields = edge
+        return self
+
+
+class outgoing_vertex(VertexDefinition):
+    """represents the declaration of an outgoing vertex"""
+    direction = 'outgoing'
+
+
+class incoming_vertex(VertexDefinition):
+    """represents the declaration of an incoming vertex"""
+    direction = 'incoming'
+
+
+class indirect_vertex(VertexDefinition):
+    """represents the declaration of an indirect vertex"""
+    direction = 'indirect'
+
+
+class VertexFactory(object):
+    def __init__(self, edge):
+        self.target = edge
+
+    def incoming(self, *args, **kw):
+        return incoming_vertex(*args, **kw)
+
+    def outgoing(self, *args, **kw):
+        return outgoing_vertex(*args, **kw)
+
+    def indirect(self, *args, **kw):
+        return indirect_vertex(*args, **kw)

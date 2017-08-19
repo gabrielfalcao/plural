@@ -26,9 +26,9 @@ from pygit2 import GIT_RESET_HARD
 from pygit2 import init_repository
 from pygit2 import IndexEntry
 from pygit2 import Signature
-from plural.models.meta.edges import subject_has_index
-from plural.models.edges import Subject
-from plural.models.edges import resolve_subject_name
+from plural.models.meta.edges import edge_has_index
+from plural.models.edges import Edge
+from plural.models.edges import resolve_edge_name
 from plural.util import generate_uuid
 from plural.util import serialize_commit
 
@@ -94,63 +94,63 @@ class PluralStore(object):
         results = list(self.iter_versions(branch))
         return results
 
-    def add_spo(self, subject, predicate, data):
-        """creates a staged entry of subject, predicate and object
+    def add_spo(self, edge, predicate, data):
+        """creates a staged entry of edge, predicate and object
 
-        :param subject:
+        :param edge:
         :param predicate:
         :param data:
         :returns: ``bytes`` - the blob id
         """
-        subject = resolve_subject_name(subject)
+        edge = resolve_edge_name(edge)
         blob_id = self.repository.create_blob(data)
-        entry = IndexEntry(os.path.join(subject, predicate), blob_id, GIT_FILEMODE_BLOB)
+        entry = IndexEntry(os.path.join(edge, predicate), blob_id, GIT_FILEMODE_BLOB)
         self.repository.index.add(entry)
         return blob_id
 
-    def create(self, subject, **obj):
-        """creates a staged subject entry including its indexed fields.
+    def create(self, edge, **obj):
+        """creates a staged edge entry including its indexed fields.
 
-        :param subject: a string or a :py:class:`Subject` subclass reference
+        :param edge: a string or a :py:class:`Edge` subclass reference
         :param ``**kw``: the field values
-        :returns: an instance of the given subject
+        :returns: an instance of the given edge
 
         """
         predicate_ids = []
 
-        subject = resolve_subject_name(subject)
-        subject_uuid = obj.pop('uuid', generate_uuid())
-        obj['uuid'] = subject_uuid
+        edge = resolve_edge_name(edge)
+        edge_uuid = obj.pop('uuid', generate_uuid())
+        obj['uuid'] = edge_uuid
 
-        subject_data = self.serialize(obj)
-        object_hash = bytes(pygit2.hash(subject_data))
-        object_path = os.path.join(subject, 'objects')
+        edge_data = self.serialize(obj)
+        object_hash = bytes(pygit2.hash(edge_data))
+        object_path = os.path.join(edge, 'objects')
 
-        id_path = os.path.join(subject, '_ids')
-        uuid_path = os.path.join(subject, '_uuids')
+        id_path = os.path.join(edge, '_ids')
+        uuid_path = os.path.join(edge, '_uuids')
 
         indexes = {}
         for key in obj.keys():
             value = obj.get(key, None)
-            if subject_has_index(subject, key):
+            if edge_has_index(edge, key):
                 indexes[key] = value
 
-            predicate_path = os.path.join(subject, 'indexes', key)
+            predicate_path = os.path.join(edge, 'indexes', key)
             predicate_ids.append(self.add_spo(predicate_path, object_hash, value))
 
-        self.add_spo(object_path, object_hash, subject_data)
-        self.add_spo(id_path, subject_uuid, object_hash)
-        self.add_spo(uuid_path, object_hash, subject_uuid)
+        self.add_spo(object_path, object_hash, edge_data)
+        self.add_spo(id_path, edge_uuid, object_hash)
+        self.add_spo(uuid_path, object_hash, edge_uuid)
 
         self.queries.append(
-            ' '.join(map(bytes, ['CREATE', subject, subject_uuid]))
+            ' '.join(map(bytes, ['CREATE', edge, edge_uuid]))
         )
-        return Subject.from_data(subject, **obj)
+        return Edge.from_data(edge, **obj)
 
     def save_nodes(self, *nodes):
-        """creates staged entries for all the given subject nodes, regardless of type
+        """creates staged entries for all the given edge nodes, regardless of type
 
-        :param ``*nodes``: a list of subject instances
+        :param ``*nodes``: a list of edge instances
         """
 
         result = []
@@ -163,7 +163,7 @@ class PluralStore(object):
     def merge(self, *nodes, **kw):
         """saves and commits all given nodes
 
-        :param ``*nodes``: a list of subject instances
+        :param ``*nodes``: a list of edge instances
         :param auto_commit: ``bool`` - default: ``True``
         :returns: a list with the created nodes
         """
@@ -180,23 +180,23 @@ class PluralStore(object):
         treeish = treeish or self.repository.index
         return filter(lambda entry: fnmatch(entry.path, pattern), treeish)
 
-    def scan_all(self, subject_name=None, treeish=None, pattern='*'):
+    def scan_all(self, edge_name=None, treeish=None, pattern='*'):
         """scans all nodes
 
-        :returns: a generator that produces :py:class:`Subject` instances with the scanned data
+        :returns: a generator that produces :py:class:`Edge` instances with the scanned data
         """
-        subject_name = resolve_subject_name(subject_name)
+        edge_name = resolve_edge_name(edge_name)
         treeish = treeish or self.repository.index
-        pattern = os.path.join(subject_name, 'objects', pattern)
+        pattern = os.path.join(edge_name, 'objects', pattern)
         for entry in self.glob(pattern):
             blob = self.repository[entry.oid]
             data = self.deserialize(blob.data)
-            yield Subject.from_data(subject_name, **data)
+            yield Edge.from_data(edge_name, **data)
 
     def delete(self, *nodes, **kw):
         """deletes and (optionally) commits all given nodes
 
-        :param ``*nodes``: a list of subject instances to be deleted
+        :param ``*nodes``: a list of edge instances to be deleted
         :param auto_commit: ``bool`` - default: ``False``
         :returns: a list with the deleted nodes
         """
@@ -215,36 +215,36 @@ class PluralStore(object):
 
         return nodes
 
-    def get_subject_by_uuid(self, subject_name, uuid):
-        """retrieves a subject by id
+    def get_edge_by_uuid(self, edge_name, uuid):
+        """retrieves a edge by id
 
-        :param subject_name: the subject name or type
+        :param edge_name: the edge name or type
         :param uuid: the uuid value
         """
-        subject_name = resolve_subject_name(subject_name)
-        pattern = os.sep.join([subject_name, '_ids', uuid])
+        edge_name = resolve_edge_name(edge_name)
+        pattern = os.sep.join([edge_name, '_ids', uuid])
         for entry in self.glob(pattern):
-            subject_blob_id = self.repository[entry.oid].data
-            blob = self.repository[subject_blob_id]
-            return Subject.from_data(subject_name, **self.deserialize(blob.data))
+            edge_blob_id = self.repository[entry.oid].data
+            blob = self.repository[edge_blob_id]
+            return Edge.from_data(edge_name, **self.deserialize(blob.data))
 
-    def match_subjects_by_index(self, subject_name, field_name, match_callback):
-        """retrieves multiple subjects by indexed field
+    def match_edges_by_index(self, edge_name, field_name, match_callback):
+        """retrieves multiple edges by indexed field
 
-        :param subject_name: the subject name or type
+        :param edge_name: the edge name or type
         :param uuid: the uuid value
         """
-        subject_name = resolve_subject_name(subject_name)
-        pattern = os.sep.join([subject_name or '*', 'indexes', '*'])
+        edge_name = resolve_edge_name(edge_name)
+        pattern = os.sep.join([edge_name or '*', 'indexes', '*'])
         # for index, oid in filter(lambda (index, oid): field_name in index, self.glob(pattern)):
         for index, oid in self.trace_path(self.glob(pattern)):
             path, blob_id = os.path.split(index)
-            subject_name = path.split(os.sep)[0]
+            edge_name = path.split(os.sep)[0]
             value = self.repository[oid].data
             if match_callback(value):
                 blob = self.repository[blob_id]
                 data = self.deserialize(blob.data)
-                Definition = Subject.definition(subject_name)
+                Definition = Edge.definition(edge_name)
                 yield Definition(**data)
 
     def commit(self, query=None):

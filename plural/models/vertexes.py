@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from plural.models.meta.vertexes import MetaVertex
 from plural.models.meta.vertexes import VERTEXES
+from plural.models.meta.vertexes import is_vertex_subclass
 from plural.models.element import Element
 
 from plural.exceptions import VertexDefinitionNotFound
@@ -102,3 +103,34 @@ class Vertex(Element):
             paths.append('{vertex_name}/indexes/{predicate}/{blob_id}'.format(**context))
 
         return map(lambda path: path.format(**context), paths)
+
+    def attach_origin(self, origin):
+        self.origin = origin
+        if not self.reverse_label:
+            origin_name = origin.__name__.lower()
+            self.reverse_label = "{}s".format(origin_name)
+
+    def is_attached(self):
+        return is_vertex_subclass(self.origin)
+
+
+class IncomingVertex(Vertex):
+    """represents the data from a vertex coming from the origin into the target
+    (O)-[v]->(T)
+    """
+    direction = 'incoming'
+
+
+class OutgoingVertex(Vertex):
+    """represents the data from a vertex going out the target into the origin
+    (O)<-[v]-(T)
+
+    """
+    direction = 'outgoing'
+
+
+class IndirectVertex(Vertex):
+    """represents the data from a vertex that connects two edges without direction
+    (O)-[v]-(T)
+    """
+    direction = 'indirect'

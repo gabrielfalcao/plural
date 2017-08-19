@@ -19,11 +19,9 @@ import json
 from hashlib import sha256
 from plural.util import generate_uuid
 
-from plural.exceptions import ElementDefinitionNotFound
-
 
 class Element(object):
-    """represents a node type (or "model", if you will)."""
+    """json-serializable data-model for Edges and Vertices"""
 
     def __init__(self, uuid=None, **kw):
         self.uuid = kw.get('uuid', uuid)
@@ -76,70 +74,6 @@ class Element(object):
 
         return codec.encode(value)
 
-    @staticmethod
-    def definition(name):
-        """
-        resolves a :py:class:`Element` by its type name
-
-        :param name: a dictionary
-        :returns: the given :py:class:`Element` subclass
-        """
-        try:
-            return resolve_element(name)
-        except KeyError:
-            raise ElementDefinitionNotFound('there are no element subclass defined with the name "{}"'.format(name))
-
-    @classmethod
-    def from_data(cls, ___name___=None, **kw):
-        """
-        creates a new instance of the given :py:class:`Element` with the provided ``**kwargs``
-
-        :param ___name___: the name of the element type
-        :param ``**kw``: a dictionary
-        :returns: an instance of the given :py:class:`Element` subclass
-        """
-        name = ___name___ or cls.__name__
-        Definition = cls.definition(name)
-        return Definition(**kw)
-
-    @classmethod
-    def from_dict(Definition, data):
-        """
-        creates a new instance of the given :py:class:`Element` with the provided ``data``
-
-        :param data: a dictionary
-        :returns: an instance of the given :py:class:`Element` subclass
-        """
-        return Definition(**data)
-
-    def get_related_blob_paths(self, repository):
-        """
-        returns a list of all possible blob paths of a element instance.
-
-        :param repository: a ``pygit2.Repository``
-        :returns: the given :py:class:`Element` subclass
-        """
-        element_name = self.__class__.__name__
-        uuid = self.uuid
-        blob_id_path = '{element_name}/_ids/{uuid}'.format(**locals())
-        blob_id = repository[repository.index[blob_id_path].oid].data
-        context = {
-            'element_name': element_name,
-            'blob_id': blob_id,
-            'uuid': uuid,
-        }
-        paths = [
-            '{element_name}/_ids/{uuid}',
-            '{element_name}/_uuids/{blob_id}',
-            '{element_name}/indexes/uuid/{blob_id}',
-            '{element_name}/objects/{blob_id}',
-        ]
-        for predicate in self.indexes:
-            context['predicate'] = predicate
-            paths.append('{element_name}/indexes/{predicate}/{blob_id}'.format(**context))
-
-        return map(lambda path: path.format(**context), paths)
-
     def __hash__(self):
         return int(sha256(self.to_json()).hexdigest(), 16)
 
@@ -147,7 +81,7 @@ class Element(object):
         return ''.join([self.__class__.__name__, self.to_json()])
 
     def __repr__(self):
-        return bytes(self)
+        return ".".join([self.__class__.__module__, bytes(self)])
 
     def __eq__(self, other):
         return isinstance(other, Element) and self.to_dict() == other.to_dict()

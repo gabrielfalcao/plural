@@ -16,18 +16,18 @@ Instalation
     pip install plural
 
 
-Declaring Subjects
+Declaring Edges
 ------------------
 
 
 .. code:: python
 
     from plural import Plural
-    from plural import Subject
+    from plural import Edge
 
     store = Plural('my-git-cms')
 
-    class Document(Subject):
+    class Document(Edge):
         indexes = {'title'}
         predicates = (
             ('title', codec.Unicode),
@@ -78,11 +78,11 @@ One By UUID
 
 .. code:: python
 
-    # Using the class Document as subject type
-    docs1 = store.get_subject_by_uuid(Document, uuid1)
+    # Using the class Document as edge type
+    docs1 = store.get_edge_by_uuid(Document, uuid1)
 
-    # Using the subject label
-    docs2 = store.get_subject_by_uuid('Document', uuid2)
+    # Using the edge label
+    docs2 = store.get_edge_by_uuid('Document', uuid2)
 
 
 Many By Indexed Predicate
@@ -97,11 +97,11 @@ Many By Indexed Predicate
 
     # DSL
     query = predicate('title').contains('Blog')
-    blog_documents = set(store.match_subjects_by_index(Document, 'title', query))
+    blog_documents = set(store.match_edges_by_index(Document, 'title', query))
 
     # With Regex
     query = predicate('title').matches('([Bb]log|[Ee]ssa[yi]s?)')
-    blogs_and_essays = set(store.match_subjects_by_index(Document, 'title', query))
+    blogs_and_essays = set(store.match_edges_by_index(Document, 'title', query))
 
 Update
 ------

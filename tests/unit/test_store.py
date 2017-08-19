@@ -19,7 +19,7 @@ from pygit2 import GIT_FILEMODE_BLOB
 from mock import patch, call, MagicMock
 
 from plural.store import PluralStore
-from tests.subjects import Car
+from tests.edges import Car
 from .scenarios import with_graph_store
 
 
@@ -138,11 +138,11 @@ def test_add_spo(context, IndexEntry):
     context.store.repository.create_blob.return_value = 'blob-id'
     IndexEntry.return_value = 'index-entry'
 
-    context.store.add_spo('subject', 'predicate', 'object')
+    context.store.add_spo('edge', 'predicate', 'object')
     context.store.repository.create_blob.assert_called_once_with('object')
     context.store.repository.index.add.assert_called_once_with('index-entry')
     IndexEntry.assert_called_once_with(
-        'subject/predicate', 'blob-id', GIT_FILEMODE_BLOB)
+        'edge/predicate', 'blob-id', GIT_FILEMODE_BLOB)
 
 
 @with_graph_store('/path/to/folder')

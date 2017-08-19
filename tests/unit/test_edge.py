@@ -16,21 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
-from plural.models.edges import Subject
-from plural.models.meta.edges import subject_has_index
-from plural.exceptions import InvalidSubjectDefinition
-from plural.exceptions import SubjectDefinitionNotFound
+from plural.models.edges import Edge
+from plural.models.meta.edges import edge_has_index
+from plural.exceptions import InvalidEdgeDefinition
+from tests.edges import Person
 
 
-class Person(Subject):
-    indexes = {
-        'name',
-        'birthdate',
-    }
-
-
-def test_subject_from_data_to_dict():
-    ('Subject.from_data(**fields).to_dict() should contain its data')
+def test_edge_from_data_to_dict():
+    ('Edge.from_data(**fields).to_dict() should contain its data')
 
     input_data = {
         'name': 'Foo Bar',
@@ -45,8 +38,8 @@ def test_subject_from_data_to_dict():
     foobar.to_dict().should.have.key('uuid').being.a(basestring)
 
 
-def test_subject_from_dict_get_item():
-    ('Subject.from_data(**fields)["field_name"] should return its value')
+def test_edge_from_dict_get_item():
+    ('Edge.from_data(**fields)["field_name"] should return its value')
 
     input_data = {
         'name': 'Foo Bar',
@@ -64,8 +57,8 @@ def test_subject_from_dict_get_item():
     foobar.should_not.have.key('invalid-one')
 
 
-def test_subject_from_dict_get_attribute():
-    ('Subject.from_data(**fields).field_name should return its value')
+def test_edge_from_dict_get_attribute():
+    ('Edge.from_data(**fields).field_name should return its value')
 
     input_data = {
         'name': 'Foo Bar',
@@ -86,33 +79,33 @@ def test_subject_from_dict_get_attribute():
 
     foobar.to_json().should.equal(json.dumps(foobar.to_dict()))
     bytes(foobar).should.match('^Person[{]')
-    repr(foobar).should.match('^Person[{]')
+    repr(foobar).should.match('^tests.edges.Person[{]')
     foobar.should.equal(foobar)
 
 
-def test_subject_has_index():
-    ('subject_has_index() should return a set')
+def test_edge_has_index():
+    ('edge_has_index() should return a set')
 
-    subject_has_index('Person', 'name').should.equal({'name'})
-    subject_has_index('Person', 'email').should.be.false
-    subject_has_index('Unknown', 'name').should.be.false
+    edge_has_index('Person', 'name').should.equal({'name'})
+    edge_has_index('Person', 'email').should.be.false
+    edge_has_index('Unknown', 'name').should.be.false
 
 
-def test_define_invalid_subject_no_indexes():
-    ('declaring Subject without indexes should raise InvalidSubjectDefinition')
+def test_define_invalid_edge_no_indexes():
+    ('declaring Edge without indexes should raise InvalidEdgeDefinition')
 
     def declare():
-        class Thing(Subject):
+        class Thing(Edge):
             pass
 
-    declare.when.called.should.have.raised(InvalidSubjectDefinition)
+    declare.when.called.should.have.raised(InvalidEdgeDefinition)
 
 
-def test_define_invalid_subject_invalid_indexes():
-    ('declaring Subject with invalid indexes should raise InvalidSubjectDefinition')
+def test_define_invalid_edge_invalid_indexes():
+    ('declaring Edge with invalid indexes should raise InvalidEdgeDefinition')
 
     def declare():
-        class Thing(Subject):
+        class Thing(Edge):
             indexes = 'invalid'
 
-    declare.when.called.should.have.raised(InvalidSubjectDefinition)
+    declare.when.called.should.have.raised(InvalidEdgeDefinition)

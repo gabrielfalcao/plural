@@ -15,27 +15,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from plural import IncomingVertex
+from plural import OutgoingVertex
+from plural import codec
 
 
-class InvalidElementDefinition(Exception):
-    """raised when a :py:class:`Element` has an invalid definition"""
+class CarPurchase(IncomingVertex):
+    indexes = {'contract_signed_at', 'payment_sent_at'}
+    fields = {
+        'contract_signed_at': codec.DateTime,
+        'payment_sent_at': codec.DateTime,
+    }
 
 
-class InvalidEdgeDefinition(InvalidElementDefinition):
-    """raised when a :py:class:`Edge` has an invalid definition"""
+class CarSales(OutgoingVertex):
+    indexes = {'contract_signed_at', 'payment_received_at'}
+    fields = {
+        'contract_signed_at': codec.DateTime,
+        'payment_received_at': codec.DateTime,
+    }
 
 
-class InvalidVertexDefinition(InvalidElementDefinition):
-    """raised when a :py:class:`Vertex` has an invalid definition"""
-
-
-class ElementDefinitionNotFound(Exception):
-    """raised when a :py:class:`Element` has an invalid definition"""
-
-
-class VertexDefinitionNotFound(ElementDefinitionNotFound):
-    """raised when a :py:class:`Vertex` has an invalid definition"""
-
-
-class EdgeDefinitionNotFound(ElementDefinitionNotFound):
-    """raised when a :py:class:`Edge` has an invalid definition"""
+class CarDeal(OutgoingVertex):
+    indexes = {'delivered_at'}
+    fields = {
+        'delivered_at': codec.DateTime,
+    }

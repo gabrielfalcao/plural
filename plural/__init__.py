@@ -16,13 +16,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from plural.models.edges import resolve_subject_name
-from plural.models.edges import resolve_subject
+from plural.models.edges import resolve_edge_name
+from plural.models.edges import resolve_edge
 from plural.store import serialize_commit
 from plural.store import PluralStore
-from plural.models.edges import Subject
-from plural.exceptions import SubjectDefinitionNotFound
-from plural.exceptions import InvalidSubjectDefinition
+from plural.models.edges import Edge
+from plural.models.vertexes import Vertex
+from plural.models.vertexes import IncomingVertex
+from plural.models.vertexes import OutgoingVertex
+from plural.models.vertexes import IndirectVertex
+from plural.models.meta.vertexes import incoming_vertex
+from plural.models.meta.vertexes import outgoing_vertex
+from plural.models.meta.vertexes import indirect_vertex
+from plural.exceptions import EdgeDefinitionNotFound
+from plural.exceptions import InvalidEdgeDefinition
 
 
 class Plural(PluralStore):
@@ -30,12 +37,19 @@ class Plural(PluralStore):
 
 
 __all__ = (
-    'resolve_subject',
-    'resolve_subject_name',
+    'resolve_edge',
+    'resolve_edge_name',
     'serialize_commit',
     'PluralStore',
     'Plural',
-    'Subject',
-    'SubjectDefinitionNotFound',
-    'InvalidSubjectDefinition',
+    'Edge',
+    'Vertex',
+    'IncomingVertex',
+    'OutgoingVertex',
+    'IndirectVertex',
+    'incoming_vertex',
+    'outgoing_vertex',
+    'indirect_vertex',
+    'EdgeDefinitionNotFound',
+    'InvalidEdgeDefinition',
 )

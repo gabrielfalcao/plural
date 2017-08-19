@@ -15,11 +15,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from plural import Subject
+from plural import Edge
 from plural import codec
 
+from tests.vertexes import CarPurchase
+from tests.vertexes import CarSales
+from tests.vertexes import CarDeal
+from plural.models.meta.vertexes import outgoing_vertex
+from plural.models.meta.vertexes import indirect_vertex
+from plural.models.meta.vertexes import incoming_vertex
 
-class Vehicle(Subject):
+
+class Vehicle(Edge):
     indexes = {
         'max_speed',
     }
@@ -28,7 +35,7 @@ class Vehicle(Subject):
     }
 
 
-class Person(Subject):
+class Person(Edge):
     indexes = {
         'name',
     }
@@ -49,27 +56,28 @@ class Car(Vehicle):
         'metadata': codec.JSON,
     }
 
-    sold_by = Person.v.incoming({
-        'contract_signed_at': codec.DateTime,
-    }, 'sales')
-
-    bought_by = Person.v.outgoing({
-        'contract_signed_at': codec.DateTime,
-    }, 'purchases')
+    vertexes = [
+        incoming_vertex('sold_by', 'Person').through(CarSales),
+        outgoing_vertex('bought_by', 'Person').through(CarPurchase),
+        indirect_vertex('deal', 'Car').through(CarDeal),
+    ]
 
 
-class Tag(Subject):
+class Tag(Edge):
     indexes = {'name'}
+    fields = {
+        'name': codec.Unicode,
+    }
 
 
-class Author(Subject):
+class Author(Edge):
     indexes = {
         'name',
         'email',
     }
 
 
-class Document(Subject):
+class Document(Edge):
     indexes = {'title', 'content'}
     fields = {
         'title': codec.Unicode,

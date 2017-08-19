@@ -16,49 +16,49 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from mock import MagicMock
-from plural.models.edges import Subject
-from plural.models.edges import resolve_subject_name
-from plural.models.edges import resolve_subject
-from plural.exceptions import SubjectDefinitionNotFound
+from plural.models.edges import Edge
+from plural.models.edges import resolve_edge_name
+from plural.models.edges import resolve_edge
+from plural.exceptions import EdgeDefinitionNotFound
 
-from tests.subjects import Car, Vehicle
+from tests.edges import Car, Vehicle
 from tests.unit.scenarios import BlobStub
 
 
-def test_resolve_subject_name():
-    'resolve_subject_name() should return a string'
+def test_resolve_edge_name():
+    'resolve_edge_name() should return a string'
 
-    resolve_subject_name('Vehicle').should.equal('Vehicle')
-    resolve_subject_name(None).should.equal('*')
-    resolve_subject_name(Vehicle).should.equal('Vehicle')
-    resolve_subject_name.when.called_with({}).should.have.raised(
+    resolve_edge_name('Vehicle').should.equal('Vehicle')
+    resolve_edge_name(None).should.equal('*')
+    resolve_edge_name(Vehicle).should.equal('Vehicle')
+    resolve_edge_name.when.called_with({}).should.have.raised(
         TypeError,
-        'resolve_subject_name() takes a Subject subclass, a string or None. Got {}'
+        'resolve_edge_name() takes a Edge subclass, a string or None. Got {}'
     )
 
 
-def test_subject_resolve_definition_not_found():
-    'Subject.definition() should raise exception if definition does not exist'
+def test_edge_resolve_definition_not_found():
+    'Edge.definition() should raise exception if definition does not exist'
 
-    Subject.definition.when.called_with('w00t?').should.have.raised(
-        SubjectDefinitionNotFound,
-        'there are no subject subclass defined with the name "w00t?"',
+    Edge.definition.when.called_with('w00t?').should.have.raised(
+        EdgeDefinitionNotFound,
+        'there are no edge subclass defined with the name "w00t?"',
     )
 
 
-def test_resolve_subject():
-    'resolve_subject() should return a string'
+def test_resolve_edge():
+    'resolve_edge() should return a string'
 
-    resolve_subject('Vehicle').should.equal(Vehicle)
-    resolve_subject(Vehicle).should.equal(Vehicle)
-    resolve_subject.when.called_with(None).should.have.raised(
+    resolve_edge('Vehicle').should.equal(Vehicle)
+    resolve_edge(Vehicle).should.equal(Vehicle)
+    resolve_edge.when.called_with(None).should.have.raised(
         TypeError,
-        'resolve_subject() takes a Subject subclass or a string. Got None'
+        'resolve_edge() takes a Edge subclass or a string. Got None'
     )
 
 
 def test_subclasses_inherit_indexes():
-    ('Subject subclasses should inherit indexes of its parent')
+    ('Edge subclasses should inherit indexes of its parent')
 
     Car.indexes.should.equal({
         'max_speed',
@@ -68,7 +68,7 @@ def test_subclasses_inherit_indexes():
 
 
 def test_get_related_blob_paths():
-    ('Subject.get_related_blob_paths() should use its uuid to retrieve '
+    ('Edge.get_related_blob_paths() should use its uuid to retrieve '
      'the path for all indexed fields and objects related to it')
 
     car = Car(uuid='deadbeef', name='Tesla', model='S')

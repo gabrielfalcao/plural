@@ -3,17 +3,17 @@
 from plural.query import predicate
 from tests.functional.helpers import list_file_tree
 from tests.functional.scenarios import with_hexastore
-from tests.subjects import Document
+from tests.edges import Document
 
 
 @with_hexastore('cms')
-def test_create_subject(context):
+def test_create_edge(context):
     store = context.store
 
     uuid1 = 'deadbeefdeadbeefdeadbeefdeadbeef'
     uuid2 = '1c3b00da1c3b00da1c3b00da1c3b00da'
 
-    # Subject can be created
+    # Edge can be created
     docs1 = store.create(
         'Document',
         uuid=uuid1,
@@ -46,21 +46,21 @@ def test_create_subject(context):
     )
     store.commit()
 
-    docs11 = store.get_subject_by_uuid('Document', uuid1)
-    docs22 = store.get_subject_by_uuid(Document, uuid2)
+    docs11 = store.get_edge_by_uuid('Document', uuid1)
+    docs22 = store.get_edge_by_uuid(Document, uuid2)
     docs1.should.equal(docs11)
     docs2.should.equal(docs22)
 
     matcher = lambda title: 'Blog' in title
-    blog_documents = set(store.match_subjects_by_index('Document', 'title', matcher))
+    blog_documents = set(store.match_edges_by_index('Document', 'title', matcher))
     blog_documents.should.have.length_of(1)
     blog_documents.should.equal({docs2})
 
-    blog_documents = set(store.match_subjects_by_index('Document', 'title', predicate('title').contains('Blog')))
+    blog_documents = set(store.match_edges_by_index('Document', 'title', predicate('title').contains('Blog')))
     blog_documents.should.have.length_of(1)
     blog_documents.should.equal({docs2})
 
-    blog_documents = set(store.match_subjects_by_index('Document', 'title', predicate('title').regex.matches('[Bb]log')))
+    blog_documents = set(store.match_edges_by_index('Document', 'title', predicate('title').regex.matches('[Bb]log')))
     blog_documents.should.have.length_of(1)
     blog_documents.should.equal({docs2})
 
@@ -105,7 +105,7 @@ def test_bare(context):
     uuid1 = 'deadbeefdeadbeefdeadbeefdeadbeef'
     uuid2 = '1c3b00da1c3b00da1c3b00da1c3b00da'
 
-    # Subject can be created
+    # Edge can be created
     docs1 = store.create(
         'Document',
         uuid=uuid1,
@@ -138,13 +138,13 @@ def test_bare(context):
     )
     store.commit()
 
-    docs11 = store.get_subject_by_uuid('Document', uuid1)
-    docs22 = store.get_subject_by_uuid(Document, uuid2)
+    docs11 = store.get_edge_by_uuid('Document', uuid1)
+    docs22 = store.get_edge_by_uuid(Document, uuid2)
     docs1.should.equal(docs11)
     docs2.should.equal(docs22)
 
     matcher = lambda title: 'Blog' in title
-    blog_documents = set(store.match_subjects_by_index('Document', 'title', matcher))
+    blog_documents = set(store.match_edges_by_index('Document', 'title', matcher))
     blog_documents.should.have.length_of(1)
     blog_documents.should.equal({docs2})
     set(store.scan_all('Document')).should.equal({

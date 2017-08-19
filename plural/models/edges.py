@@ -15,19 +15,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from plural.models.meta.edges import MetaSubject
+from plural.models.meta.edges import MetaEdge
 from plural.models.meta.edges import SUBJECTS
+# from plural.models.meta.edges import is_edge_subclass
+
 from plural.models.element import Element
 
-from plural.exceptions import SubjectDefinitionNotFound
+from plural.exceptions import EdgeDefinitionNotFound
 
 
-def resolve_subject_name(subj):
+def resolve_edge_name(subj):
     """
-    :param subj: an :py:class:`Subject` instance or string
+    :param subj: an :py:class:`Edge` instance or string
     :returns: a string
     """
-    if isinstance(subj, type) and issubclass(subj, Subject):
+    if isinstance(subj, type) and issubclass(subj, Edge):
         return subj.__name__
     elif subj is None:
         return '*'
@@ -35,70 +37,93 @@ def resolve_subject_name(subj):
         return subj
     else:
         msg = (
-            'resolve_subject_name() takes a Subject subclass, '
+            'resolve_edge_name() takes a Edge subclass, '
             'a string or None. Got {}'
         )
         raise TypeError(msg.format(repr(subj)))
 
 
-def resolve_subject(subj):
+def resolve_edge(subj):
     """
-    :param subj: an :py:class:`Subject` instance or string
-    :returns: a :py:class:`Subject` subclass
+    :param subj: an :py:class:`Edge` instance or string
+    :returns: a :py:class:`Edge` subclass
     """
-    if isinstance(subj, type) and issubclass(subj, Subject):
+    if isinstance(subj, type) and issubclass(subj, Edge):
         return subj
     elif isinstance(subj, basestring):
         return SUBJECTS[subj]
     else:
         msg = (
-            'resolve_subject() takes a Subject subclass or '
+            'resolve_edge() takes a Edge subclass or '
             'a string. Got {}'
         )
         raise TypeError(msg.format(repr(subj)))
 
 
-class Subject(Element):
+class Edge(Element):
     """represents a node type (or "model", if you will)."""
-    __metaclass__ = MetaSubject
+    __metaclass__ = MetaEdge
 
     @staticmethod
     def definition(name):
         """
-        resolves a :py:class:`Subject` by its type name
+        resolves a :py:class:`Edge` by its type name
 
         :param name: a dictionary
-        :returns: the given :py:class:`Subject` subclass
+        :returns: the given :py:class:`Edge` subclass
         """
         try:
-            return resolve_subject(name)
+            return resolve_edge(name)
         except KeyError:
-            raise SubjectDefinitionNotFound('there are no subject subclass defined with the name "{}"'.format(name))
+            raise EdgeDefinitionNotFound('there are no edge subclass defined with the name "{}"'.format(name))
 
     def get_related_blob_paths(self, repository):
         """
-        returns a list of all possible blob paths of a :py:class:`Subject` instance.
+        returns a list of all possible blob paths of a :py:class:`Edge` instance.
 
         :param repository: a ``pygit2.Repository``
-        :returns: the given :py:class:`Subject` subclass
+        :returns: the given :py:class:`Edge` subclass
         """
-        subject_name = self.__class__.__name__
+        edge_name = self.__class__.__name__
         uuid = self.uuid
-        blob_id_path = '{subject_name}/_ids/{uuid}'.format(**locals())
+        blob_id_path = '{edge_name}/_ids/{uuid}'.format(**locals())
         blob_id = repository[repository.index[blob_id_path].oid].data
         context = {
-            'subject_name': subject_name,
+            'edge_name': edge_name,
             'blob_id': blob_id,
             'uuid': uuid,
         }
         paths = [
-            '{subject_name}/_ids/{uuid}',
-            '{subject_name}/_uuids/{blob_id}',
-            '{subject_name}/indexes/uuid/{blob_id}',
-            '{subject_name}/objects/{blob_id}',
+            '{edge_name}/_ids/{uuid}',
+            '{edge_name}/_uuids/{blob_id}',
+            '{edge_name}/indexes/uuid/{blob_id}',
+            '{edge_name}/objects/{blob_id}',
         ]
         for predicate in self.indexes:
             context['predicate'] = predicate
-            paths.append('{subject_name}/indexes/{predicate}/{blob_id}'.format(**context))
+            paths.append('{edge_name}/indexes/{predicate}/{blob_id}'.format(**context))
 
         return map(lambda path: path.format(**context), paths)
+
+    @classmethod
+    def from_data(cls, ___name___=None, **kw):
+        """
+        creates a new instance of the given :py:class:`Element` with the provided ``**kwargs``
+
+        :param ___name___: the name of the element type
+        :param ``**kw``: a dictionary
+        :returns: an instance of the given :py:class:`Element` subclass
+        """
+        name = ___name___ or cls.__name__
+        Definition = cls.definition(name)
+        return Definition(**kw)
+
+    @classmethod
+    def from_dict(Definition, data):
+        """
+        creates a new instance of the given :py:class:`Element` with the provided ``data``
+
+        :param data: a dictionary
+        :returns: an instance of the given :py:class:`Element` subclass
+        """
+        return Definition(**data)
