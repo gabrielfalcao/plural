@@ -21,8 +21,8 @@ from mock import patch, call, MagicMock
 from plural.store import PluralStore
 from tests.edges import Car
 from tests.edges import Person
-from tests.vertexes import CarPurchase
-from tests.vertexes import CarSale
+from tests.vertices import CarPurchase
+from tests.vertices import CarSale
 from .scenarios import with_graph_store
 
 

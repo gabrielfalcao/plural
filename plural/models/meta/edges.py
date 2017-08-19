@@ -18,7 +18,7 @@
 
 from collections import defaultdict
 from collections import OrderedDict
-from plural.models.meta.vertexes import VertexFactory
+from plural.models.meta.vertices import VertexFactory
 from plural.models.element import Element
 from plural.exceptions import InvalidEdgeDefinition
 

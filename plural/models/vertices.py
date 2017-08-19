@@ -15,9 +15,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from plural.models.meta.vertexes import MetaVertex
-from plural.models.meta.vertexes import VERTEXES
-from plural.models.meta.vertexes import is_vertex_subclass
+from plural.models.meta.vertices import MetaVertex
+from plural.models.meta.vertices import VERTEXES
+from plural.models.meta.vertices import is_vertex_subclass
 from plural.models.element import Element
 
 from plural.exceptions import VertexDefinitionNotFound

@@ -18,14 +18,14 @@
 from plural import Edge
 from plural import codec
 
-from tests.vertexes import AuthoredDocument
-from tests.vertexes import TaggedDocument
-from tests.vertexes import CarPurchase
-from tests.vertexes import CarSale
-from tests.vertexes import CarDeal
-from plural.models.meta.vertexes import outgoing_vertex
-from plural.models.meta.vertexes import indirect_vertex
-from plural.models.meta.vertexes import incoming_vertex
+from tests.vertices import AuthoredDocument
+from tests.vertices import TaggedDocument
+from tests.vertices import CarPurchase
+from tests.vertices import CarSale
+from tests.vertices import CarDeal
+from plural.models.meta.vertices import outgoing_vertex
+from plural.models.meta.vertices import indirect_vertex
+from plural.models.meta.vertices import incoming_vertex
 
 
 class Vehicle(Edge):
@@ -58,7 +58,7 @@ class Car(Vehicle):
         'metadata': codec.JSON,
     }
 
-    vertexes = [
+    vertices = [
         incoming_vertex('sold_by', 'Person').through(CarSale),
         outgoing_vertex('bought_by', 'Person').through(CarPurchase),
         indirect_vertex('deal', 'Car').through(CarDeal),
@@ -85,7 +85,7 @@ class Document(Edge):
         'title': codec.Unicode,
     }
 
-    vertexes = [
+    vertices = [
         incoming_vertex('authored_by', Author).through(AuthoredDocument),
         outgoing_vertex('tagged_by', Tag).through(TaggedDocument),
     ]

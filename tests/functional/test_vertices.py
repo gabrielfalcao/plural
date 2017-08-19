@@ -3,8 +3,8 @@ from datetime import datetime
 from decimal import Decimal
 from tests.functional.scenarios import with_hexastore
 from tests.edges import Car, Person
-from tests.vertexes import CarPurchase
-from tests.vertexes import CarSale
+from tests.vertices import CarPurchase
+from tests.vertices import CarSale
 
 
 @with_hexastore('vehicles')

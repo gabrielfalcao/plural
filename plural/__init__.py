@@ -21,13 +21,13 @@ from plural.models.edges import resolve_edge
 from plural.store import serialize_commit
 from plural.store import PluralStore
 from plural.models.edges import Edge
-from plural.models.vertexes import Vertex
-from plural.models.vertexes import IncomingVertex
-from plural.models.vertexes import OutgoingVertex
-from plural.models.vertexes import IndirectVertex
-from plural.models.meta.vertexes import incoming_vertex
-from plural.models.meta.vertexes import outgoing_vertex
-from plural.models.meta.vertexes import indirect_vertex
+from plural.models.vertices import Vertex
+from plural.models.vertices import IncomingVertex
+from plural.models.vertices import OutgoingVertex
+from plural.models.vertices import IndirectVertex
+from plural.models.meta.vertices import incoming_vertex
+from plural.models.meta.vertices import outgoing_vertex
+from plural.models.meta.vertices import indirect_vertex
 from plural.exceptions import EdgeDefinitionNotFound
 from plural.exceptions import InvalidEdgeDefinition
 

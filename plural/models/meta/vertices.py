@@ -53,16 +53,16 @@ class MetaVertex(type):
         indexes = set()
         codecs = {}
 
-        if name == 'Vertex':  # and cls.__module__.startswith('plural.models.vertexes'):
+        if name == 'Vertex':  # and cls.__module__.startswith('plural.models.vertices'):
             MetaVertex.Target = cls
             super(MetaVertex, cls).__init__(name, bases, members)
             return
 
-        if name == 'MetaVertex':  # and cls.__module__.startswith('plural.models.vertexes'):
+        if name == 'MetaVertex':  # and cls.__module__.startswith('plural.models.vertices'):
             super(MetaVertex, cls).__init__(name, bases, members)
             return
 
-        if name not in ('MetaVertex', 'Vertex') and not cls.__module__.startswith('plural.models.vertexes'):
+        if name not in ('MetaVertex', 'Vertex') and not cls.__module__.startswith('plural.models.vertices'):
             VERTEXES[name] = cls
             VERTEXES_BY_CLASS[cls] = name
             indexes = validate_vertex_definition(name, cls, members)

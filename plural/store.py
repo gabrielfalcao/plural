@@ -27,13 +27,13 @@ from pygit2 import init_repository
 from pygit2 import IndexEntry
 from pygit2 import Signature
 from plural.models.meta.edges import edge_has_index
-from plural.models.meta.vertexes import vertex_has_index
+from plural.models.meta.vertices import vertex_has_index
 from plural.models.meta.edges import is_edge_subclass
-from plural.models.meta.vertexes import is_vertex_subclass
+from plural.models.meta.vertices import is_vertex_subclass
 from plural.models.edges import Edge
-from plural.models.vertexes import Vertex
+from plural.models.vertices import Vertex
 from plural.models.edges import resolve_edge_name
-from plural.models.vertexes import resolve_vertex_name
+from plural.models.vertices import resolve_vertex_name
 from plural.util import generate_uuid
 from plural.util import serialize_commit
 from plural.util import AutoCodec
