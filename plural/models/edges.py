@@ -17,47 +17,47 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from plural.models.meta.edges import MetaEdge
 from plural.models.meta.edges import SUBJECTS
-# from plural.models.meta.edges import is_edge_subclass
+from plural.models.meta.edges import is_edge_subclass
 
 from plural.models.element import Element
 
 from plural.exceptions import EdgeDefinitionNotFound
 
 
-def resolve_edge_name(subj):
+def resolve_edge_name(edge):
     """
-    :param subj: an :py:class:`Edge` instance or string
+    :param edge: an :py:class:`Edge` instance or string
     :returns: a string
     """
-    if isinstance(subj, type) and issubclass(subj, Edge):
-        return subj.__name__
-    elif subj is None:
+    if is_edge_subclass(edge):
+        return edge.__name__
+    elif edge is None:
         return '*'
-    elif isinstance(subj, basestring):
-        return subj
+    elif isinstance(edge, basestring):
+        return edge
     else:
         msg = (
             'resolve_edge_name() takes a Edge subclass, '
             'a string or None. Got {}'
         )
-        raise TypeError(msg.format(repr(subj)))
+        raise TypeError(msg.format(repr(edge)))
 
 
-def resolve_edge(subj):
+def resolve_edge(edge):
     """
-    :param subj: an :py:class:`Edge` instance or string
+    :param edge: an :py:class:`Edge` instance or string
     :returns: a :py:class:`Edge` subclass
     """
-    if isinstance(subj, type) and issubclass(subj, Edge):
-        return subj
-    elif isinstance(subj, basestring):
-        return SUBJECTS[subj]
+    if is_edge_subclass(edge):
+        return edge
+    elif isinstance(edge, basestring):
+        return SUBJECTS[edge]
     else:
         msg = (
             'resolve_edge() takes a Edge subclass or '
             'a string. Got {}'
         )
-        raise TypeError(msg.format(repr(subj)))
+        raise TypeError(msg.format(repr(edge)))
 
 
 class Edge(Element):

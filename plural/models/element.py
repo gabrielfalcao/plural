@@ -16,8 +16,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
+# from time import mktime
+from decimal import Decimal
+from datetime import datetime, date, time
 from hashlib import sha256
 from plural.util import generate_uuid
+
+
+class AutoCodec(object):
+    def decode(self, obj):
+        return obj
+
+    def encode(self, obj):
+        if isinstance(obj, (datetime, date, time)):
+            return obj.isoformat()
+
+        if isinstance(obj, (Decimal)):
+            return bytes(obj)
+
+        if obj is None:
+            return b''
+
+        return obj
 
 
 class Element(object):
@@ -58,17 +78,18 @@ class Element(object):
         return dict([(k, self.encode_field(k, v)) for k, v in self.__data__.items()])
 
     def to_json(self, **kw):
+        kw['default'] = AutoCodec().encode
         return json.dumps(self.to_dict(), **kw)
 
     def decode_field(self, name, value):
-        codec = self.__codecs__.get(name)
+        codec = self.__codecs__.get(name, AutoCodec())
         if not codec:
             return value
 
         return codec.decode(value)
 
     def encode_field(self, name, value):
-        codec = self.__codecs__.get(name)
+        codec = self.__codecs__.get(name, AutoCodec())
         if not codec:
             return value or ''
 

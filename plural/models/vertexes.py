@@ -23,45 +23,51 @@ from plural.models.element import Element
 from plural.exceptions import VertexDefinitionNotFound
 
 
-def resolve_vertex_name(subj):
+def resolve_vertex_name(vertex):
     """
-    :param subj: an :py:class:`Vertex` instance or string
+    :param vertex: an :py:class:`Vertex` instance or string
     :returns: a string
     """
-    if isinstance(subj, type) and issubclass(subj, Vertex):
-        return subj.__name__
-    elif subj is None:
+    if is_vertex_subclass(vertex):
+        return vertex.__name__
+
+    elif vertex is None:
         return '*'
-    elif isinstance(subj, basestring):
-        return subj
+    elif isinstance(vertex, basestring):
+        return vertex
     else:
         msg = (
             'resolve_vertex_name() takes a Vertex subclass, '
             'a string or None. Got {}'
         )
-        raise TypeError(msg.format(repr(subj)))
+        raise TypeError(msg.format(repr(vertex)))
 
 
-def resolve_vertex(subj):
+def resolve_vertex(vertex):
     """
-    :param subj: an :py:class:`Vertex` instance or string
+    :param vertex: an :py:class:`Vertex` instance or string
     :returns: a :py:class:`Vertex` subclass
     """
-    if isinstance(subj, type) and issubclass(subj, Vertex):
-        return subj
-    elif isinstance(subj, basestring):
-        return VERTEXES[subj]
+    if is_vertex_subclass(vertex):
+        return vertex
+    elif isinstance(vertex, basestring):
+        return VERTEXES[vertex]
     else:
         msg = (
             'resolve_vertex() takes a Vertex subclass or '
             'a string. Got {}'
         )
-        raise TypeError(msg.format(repr(subj)))
+        raise TypeError(msg.format(repr(vertex)))
 
 
 class Vertex(Element):
     """represents a node type (or "model", if you will)."""
     __metaclass__ = MetaVertex
+
+    def __init__(self, origin, target, *args, **kw):
+        self.origin = origin
+        self.target = target
+        super(Vertex, self).__init__(*args, **kw)
 
     @staticmethod
     def definition(name):

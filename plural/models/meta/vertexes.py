@@ -85,18 +85,32 @@ class MetaVertex(type):
 
 
 class VertexDefinition(object):
-    def __init__(self, label, edge, through=None, fields=None):
+    def __init__(self, label=None, origin=None, target=None, through=None, fields=None, reverse_label=None):
         self._label = label
-        self._origin = edge
-        self._through = through
+        self._origin = origin
+        self._target = target
+        self._vertex = through
         self._fields = fields
+        self._reverse_label = reverse_label
 
     def through(self, edge):
-        self._through = edge
+        self._vertex = edge
         return self
 
     def with_fields(self, edge):
         self._fields = edge
+        return self
+
+    def with_reverse_label(self, reverse_label):
+        self._reverse_label = reverse_label
+        return self
+
+    def with_origin(self, origin):
+        self._origin = origin
+        return self
+
+    def with_target(self, target):
+        self._target = target
         return self
 
 
@@ -119,11 +133,13 @@ class VertexFactory(object):
     def __init__(self, edge):
         self.target = edge
 
-    def incoming(self, *args, **kw):
-        return incoming_vertex(*args, **kw)
+    def incoming(self, fields, reverse_label):
+        return incoming_vertex(fields=fields, reverse_label=reverse_label,
+                               target=self.target)
 
-    def outgoing(self, *args, **kw):
-        return outgoing_vertex(*args, **kw)
+    def outgoing(self, fields, reverse_label):
+        return outgoing_vertex(fields=fields, reverse_label=reverse_label,
+                               origin=self.target)
 
-    def indirect(self, *args, **kw):
-        return indirect_vertex(*args, **kw)
+    def indirect(self, fields, reverse_label):
+        return indirect_vertex(fields=fields, reverse_label=reverse_label)
