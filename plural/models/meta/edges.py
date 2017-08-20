@@ -18,7 +18,6 @@
 
 from collections import defaultdict
 from collections import OrderedDict
-from plural.models.meta.vertices import VertexFactory
 from plural.models.element import Element
 from plural.exceptions import InvalidEdgeDefinition
 
@@ -98,7 +97,6 @@ class MetaEdge(type):
 
         codecs.update(getattr(cls, 'fields', {}))
         cls.indexes = fields
-        cls.v = VertexFactory(cls)
         cls.__fields__ = {'uuid'}.union(fields)
         cls.__data__ = {}
         cls.__codecs__ = dict([(n, Codec()) for n, Codec in codecs.items()])

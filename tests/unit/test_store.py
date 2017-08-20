@@ -77,7 +77,7 @@ def test_serialize(context):
         'foo': 'bar',
     })
 
-    result.should.equal('{\n  "foo": "bar"\n}')
+    result.should.equal('{"foo": "bar"}')
 
 
 @with_graph_store('/path/to/folder')
@@ -209,41 +209,41 @@ def test_create_edge(context, add_spo, git_object_hash):
         call('Car/indexes/nickname', 'git-object-hash', 'Lightning'),
         call('Car/indexes/brand', 'git-object-hash', 'Tesla'),
         call('Car/indexes/uuid', 'git-object-hash', 'generated-uuid4'),
-        call('Car/objects', 'git-object-hash', '{\n  "brand": "Tesla",\n  "max_speed": "160.4",\n  "model": "Model S",\n  "nickname": "Lightning",\n  "uuid": "generated-uuid4"\n}'),
+        call('Car/objects', 'git-object-hash', tesla.to_json()),
         call('Car/_ids', 'generated-uuid4', 'git-object-hash'),
         call('Car/_uuids', 'git-object-hash', 'generated-uuid4'),
     ])
 
 
-# @with_graph_store('/path/to/folder')
-# @patch('plural.store.pygit2.hash')
-# @patch('plural.store.PluralStore.add_spo')
-# def test_create_vertex_incoming(context, add_spo, git_object_hash):
-#     ('PluralStore.create_vertex() should add spos for its indexes')
+@with_graph_store('/path/to/folder')
+@patch('plural.store.pygit2.hash')
+@patch('plural.store.PluralStore.add_spo')
+def test_create_vertex_incoming(context, add_spo, git_object_hash):
+    ('PluralStore.create_vertex() should add spos for its indexes')
 
-#     git_object_hash.return_value = 'git-object-hash'
-#     tesla = Car(uuid='car-uuid', brand='Tesla')
-#     chuck = Person(uuid='chuck-uuid', name='Chuck Norris')
+    git_object_hash.return_value = 'git-object-hash'
+    tesla = Car(uuid='car-uuid', brand='Tesla')
+    chuck = Person(uuid='chuck-uuid', name='Chuck Norris')
 
-#     purchase = context.store.create_vertex(
-#         CarPurchase,
-#         uuid='purchase-uuid',
-#         origin=chuck,
-#         target=tesla,
-#         contract_signed_at='2017-08-18 00:31:45',
-#         payment_sent_at='2017-07-04 15:25:35',
-#     )
-#     purchase.should.be.a(CarPurchase)
-#     purchase.to_dict().should.be.a(dict)
+    purchase = context.store.create_vertex(
+        CarPurchase,
+        uuid='purchase-uuid',
+        origin=chuck,
+        target=tesla,
+        contract_signed_at='2017-08-18 00:31:45',
+        payment_sent_at='2017-07-04 15:25:35',
+    )
+    purchase.should.be.a(CarPurchase)
+    purchase.to_dict().should.be.a(dict)
 
-#     add_spo.assert_has_calls([
-#         call('CarPurchase/_ids', 'purchase-uuid', 'git-object-hash'),
-#         call('CarPurchase/_uuids', 'git-object-hash', 'purchase-uuid'),
-#         call('CarPurchase/indexes/contract_signed_at', 'git-object-hash', 'contract-signed-at'),
-#         call('CarPurchase/indexes/payment_sent_at', 'git-object-hash', 'payment-sent-at'),
-#         call('CarPurchase/indexes/uuid', 'git-object-hash', 'purchase-uuid'),
-#         call('vertices/bought_by/_uuids', 'chuck-uuid', purchase.to_json()),
-#     ])
+    add_spo.assert_has_calls([
+        call('CarPurchase/indexes/contract_signed_at', 'git-object-hash', '2017-08-18 00:31:45'),
+        call('CarPurchase/indexes/uuid', 'git-object-hash', 'purchase-uuid'),
+        call('CarPurchase/indexes/payment_sent_at', 'git-object-hash', '2017-07-04 15:25:35'),
+        call('CarPurchase/_ids', 'purchase-uuid', 'git-object-hash'),
+        call('CarPurchase/_uuids', 'git-object-hash', 'purchase-uuid'),
+        call('Car/incoming/bought_by/Person', 'chuck-uuid', 'car-uuid')
+    ])
 
 
 # @with_graph_store('/path/to/folder')

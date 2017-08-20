@@ -21,6 +21,7 @@ from plural import codec
 
 
 class CarPurchase(IncomingVertex):
+    label, target = 'bought_by', 'Person'
     indexes = {'contract_signed_at', 'payment_sent_at'}
     fields = {
         'contract_signed_at': codec.DateTime,
@@ -29,6 +30,7 @@ class CarPurchase(IncomingVertex):
 
 
 class CarSale(OutgoingVertex):
+    label, target = 'sold_by', 'Person'
     indexes = {'contract_signed_at', 'payment_received_at'}
     fields = {
         'contract_signed_at': codec.DateTime,
@@ -44,6 +46,7 @@ class CarDeal(OutgoingVertex):
 
 
 class AuthoredDocument(IncomingVertex):
+    label, target = 'authored_by', 'Author'
     indexes = {'created_at', 'modified_at'}
     fields = {
         'created_at': codec.DateTime,
@@ -52,6 +55,7 @@ class AuthoredDocument(IncomingVertex):
 
 
 class TaggedDocument(OutgoingVertex):
+    label, target = 'tagged_by', 'Tag'
     indexes = {'created_at'}
     fields = {
         'created_at': codec.DateTime,

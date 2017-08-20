@@ -28,6 +28,9 @@ def resolve_vertex_name(vertex):
     :param vertex: an :py:class:`Vertex` instance or string
     :returns: a string
     """
+    if isinstance(vertex, Element):
+        vertex = vertex.__class__
+
     if is_vertex_subclass(vertex):
         return vertex.__name__
 

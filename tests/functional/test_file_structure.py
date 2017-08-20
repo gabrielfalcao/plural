@@ -73,28 +73,28 @@ def test_create_edge(context):
         docs2,
     })
     sorted(list_file_tree(store.path)).should.equal(sorted([
-        u'Document/_ids/1c3b00da1c3b00da1c3b00da1c3b00da',
-        u'Document/_ids/deadbeefdeadbeefdeadbeefdeadbeef',
-        u'Document/_uuids/7fab47d1e50cfe3682a12acfce2f5208d619d5f6',
-        u'Document/_uuids/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
-        u'Document/indexes/content/7fab47d1e50cfe3682a12acfce2f5208d619d5f6',
-        u'Document/indexes/content/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
-        u'Document/indexes/title/7fab47d1e50cfe3682a12acfce2f5208d619d5f6',
-        u'Document/indexes/title/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
-        u'Document/indexes/uuid/7fab47d1e50cfe3682a12acfce2f5208d619d5f6',
-        u'Document/indexes/uuid/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
-        u'Document/objects/7fab47d1e50cfe3682a12acfce2f5208d619d5f6',
-        u'Document/objects/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
+        'Document/_ids/1c3b00da1c3b00da1c3b00da1c3b00da',
+        'Document/_ids/deadbeefdeadbeefdeadbeefdeadbeef',
+        'Document/_uuids/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/_uuids/fae1f98f713ead9b174a8d953ded3f70c42e6542',
+        'Document/indexes/content/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/indexes/content/fae1f98f713ead9b174a8d953ded3f70c42e6542',
+        'Document/indexes/title/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/indexes/title/fae1f98f713ead9b174a8d953ded3f70c42e6542',
+        'Document/indexes/uuid/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/indexes/uuid/fae1f98f713ead9b174a8d953ded3f70c42e6542',
+        'Document/objects/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/objects/fae1f98f713ead9b174a8d953ded3f70c42e6542',
     ]))
     store.delete(docs2)
     store.commit()
     sorted(list_file_tree(store.path)).should.equal(sorted([
-        u'Document/_ids/deadbeefdeadbeefdeadbeefdeadbeef',
-        u'Document/_uuids/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
-        u'Document/indexes/content/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
-        u'Document/indexes/title/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
-        u'Document/indexes/uuid/d5af9edffb41a006f51f80695f2cf3a841f8cf96',
-        u'Document/objects/d5af9edffb41a006f51f80695f2cf3a841f8cf96'
+        'Document/_ids/deadbeefdeadbeefdeadbeefdeadbeef',
+        'Document/_uuids/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/indexes/content/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/indexes/title/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/indexes/uuid/c5a61004c0bab3a5ee1244e719ade9ebd381f892',
+        'Document/objects/c5a61004c0bab3a5ee1244e719ade9ebd381f892'
     ]))
 
 

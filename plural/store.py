@@ -76,7 +76,7 @@ class PluralStore(object):
         :returns: ``string``
         """
         default = AutoCodec().encode
-        return "\n".join([line.rstrip() for line in json.dumps(obj, sort_keys=True, indent=2, default=default).split('\n')])
+        return json.dumps(obj, sort_keys=True, default=default)
 
     def deserialize(self, string):
         """deserialize a string into an object, meant for internal use only.
@@ -150,6 +150,10 @@ class PluralStore(object):
         id_path = os.path.join(vertex, '_ids')
         uuid_path = os.path.join(vertex, '_uuids')
 
+        original_obj = obj.copy()
+        origin = obj.pop('origin')
+        target = obj.pop('target')
+
         indexes = {}
         for key in obj.keys():
             value = obj.get(key, None)
@@ -159,11 +163,47 @@ class PluralStore(object):
             predicate_path = os.path.join(vertex, 'indexes', key)
             predicate_ids.append(self.add_spo(predicate_path, object_hash, value))
 
-        self.add_spo(object_path, object_hash, vertex_data)
         self.add_spo(id_path, vertex_uuid, object_hash)
         self.add_spo(uuid_path, object_hash, vertex_uuid)
 
-        return Vertex.from_data(vertex, **obj)
+        origin_name = resolve_edge_name(origin)
+        target_name = resolve_edge_name(target)
+        RelationhipModel = Vertex.definition(vertex)
+
+        label = RelationhipModel.label
+        # call('Car/incoming/bought_by/Person', 'chuck-uuid', 'car-uuid'),
+        # call('___vertices___/Car/bought_by/Person', 'chuck-uuid', 'car-uuid'),
+        path_templates = {
+            'incoming': '{to}/incoming/{label}/{from}',
+            'outgoing': '{from}/outgoing/{label}/{to}',
+            'indirect': '___indirect___/{from}/{label}/{to}',
+        }
+        vertex_path_template = path_templates[RelationhipModel.direction]
+
+        ctx = {
+            'label': label
+        }
+        if RelationhipModel.direction == 'incoming':
+            from_uuid = origin.uuid
+            ctx['from'] = origin_name
+            to_uuid = target.uuid
+            ctx['to'] = target_name
+
+        elif RelationhipModel.direction == 'outgoing':
+            from_uuid = target.uuid
+            ctx['from'] = target_name
+            to_uuid = origin.uuid
+            ctx['to'] = origin_name
+        else:
+            from_uuid = origin.uuid
+            ctx['from'] = origin_name
+            to_uuid = target.uuid
+            ctx['to'] = target_name
+
+        vertex_path = vertex_path_template.format(**ctx)
+        self.add_spo(vertex_path, from_uuid, to_uuid)
+
+        return RelationhipModel.from_data(vertex, **original_obj)
 
     def create_edge(self, edge, **obj):
         """creates a staged edge entry including its indexed fields.

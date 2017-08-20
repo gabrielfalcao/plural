@@ -127,19 +127,3 @@ class incoming_vertex(VertexDefinition):
 class indirect_vertex(VertexDefinition):
     """represents the declaration of an indirect vertex"""
     direction = 'indirect'
-
-
-class VertexFactory(object):
-    def __init__(self, edge):
-        self.target = edge
-
-    def incoming(self, fields, reverse_label):
-        return incoming_vertex(fields=fields, reverse_label=reverse_label,
-                               target=self.target)
-
-    def outgoing(self, fields, reverse_label):
-        return outgoing_vertex(fields=fields, reverse_label=reverse_label,
-                               origin=self.target)
-
-    def indirect(self, fields, reverse_label):
-        return indirect_vertex(fields=fields, reverse_label=reverse_label)

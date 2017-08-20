@@ -64,6 +64,7 @@ class Element(object):
         return dict([(k, self.encode_field(k, v)) for k, v in self.__data__.items()])
 
     def to_json(self, **kw):
+        kw['sort_keys'] = True
         kw['default'] = AutoCodec().encode
         return json.dumps(self.to_dict(), **kw)
 

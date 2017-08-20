@@ -29,6 +29,9 @@ def resolve_edge_name(edge):
     :param edge: an :py:class:`Edge` instance or string
     :returns: a string
     """
+    if isinstance(edge, Element):
+        edge = edge.__class__
+
     if is_edge_subclass(edge):
         return edge.__name__
     elif edge is None:
