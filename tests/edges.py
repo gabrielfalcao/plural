@@ -61,7 +61,7 @@ class Car(Vehicle):
     vertices = [
         incoming_vertex('sold_by', 'Person').through(CarSale),
         outgoing_vertex('bought_by', 'Person').through(CarPurchase),
-        indirect_vertex('deal', 'Car').through(CarDeal),
+        indirect_vertex('deal', 'Person').through(CarDeal),
     ]
 
 

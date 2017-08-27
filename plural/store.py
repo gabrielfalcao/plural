@@ -176,32 +176,41 @@ class PluralStore(object):
         path_templates = {
             'incoming': '{to}/incoming/{label}/{from}',
             'outgoing': '{from}/outgoing/{label}/{to}',
-            'indirect': '___indirect___/{from}/{label}/{to}',
+            'indirect': '{}/indirect/{label}/{}',
         }
         vertex_path_template = path_templates[RelationhipModel.direction]
 
         ctx = {
             'label': label
         }
-        if RelationhipModel.direction == 'incoming':
+        direction = RelationhipModel.direction
+        # self.add_spo(object_path, object_hash, vertex_data)
+
+        if direction == 'incoming':
             from_uuid = origin.uuid
             ctx['from'] = origin_name
             to_uuid = target.uuid
             ctx['to'] = target_name
+            vertex_path = vertex_path_template.format(**ctx)
+            self.add_spo(vertex_path, from_uuid, to_uuid)
 
-        elif RelationhipModel.direction == 'outgoing':
+        elif direction == 'outgoing':
             from_uuid = target.uuid
             ctx['from'] = target_name
             to_uuid = origin.uuid
             ctx['to'] = origin_name
-        else:
-            from_uuid = origin.uuid
-            ctx['from'] = origin_name
-            to_uuid = target.uuid
-            ctx['to'] = target_name
+            vertex_path = vertex_path_template.format(**ctx)
+            self.add_spo(vertex_path, from_uuid, to_uuid)
 
-        vertex_path = vertex_path_template.format(**ctx)
-        self.add_spo(vertex_path, from_uuid, to_uuid)
+        elif direction == 'indirect':
+            from_uuid = target.uuid
+            to_uuid = origin.uuid
+
+            path = vertex_path_template.format(target_name, origin_name, **ctx)
+            self.add_spo(path, from_uuid, to_uuid)
+
+            path = vertex_path_template.format(origin_name, target_name, **ctx)
+            self.add_spo(path, to_uuid, from_uuid)
 
         return RelationhipModel.from_data(vertex, **original_obj)
 
@@ -322,6 +331,19 @@ class PluralStore(object):
             blob = self.repository[edge_blob_id]
             return Edge.from_data(edge_name, **self.deserialize(blob.data))
 
+    def get_vertex_by_uuid(self, vertex_name, uuid):
+        """retrieves a vertex by id
+
+        :param vertex_name: the vertex name or type
+        :param uuid: the uuid value
+        """
+        vertex_name = resolve_vertex_name(vertex_name)
+        pattern = os.sep.join([vertex_name, '_ids', uuid])
+        for entry in self.glob(pattern):
+            vertex_blob_id = self.repository[entry.oid].data
+            blob = self.repository[vertex_blob_id]
+            return Vertex.from_data(vertex_name, **self.deserialize(blob.data))
+
     def match_edges_by_index(self, edge_name, field_name, match_callback):
         """retrieves multiple edges by indexed field
 
@@ -339,6 +361,25 @@ class PluralStore(object):
                 blob = self.repository[blob_id]
                 data = self.deserialize(blob.data)
                 Definition = Edge.definition(edge_name)
+                yield Definition(**data)
+
+    def match_vertices_by_index(self, vertex_name, field_name, match_callback):
+        """retrieves multiple vertices by indexed field
+
+        :param vertex_name: the vertex name or type
+        :param uuid: the uuid value
+        """
+        vertex_name = resolve_vertex_name(vertex_name)
+        pattern = os.sep.join([vertex_name or '*', 'indexes', '*'])
+        # for index, oid in filter(lambda (index, oid): field_name in index, self.glob(pattern)):
+        for index, oid in self.trace_path(self.glob(pattern)):
+            path, blob_id = os.path.split(index)
+            vertex_name = path.split(os.sep)[0]
+            value = self.repository[oid].data
+            if match_callback(value):
+                blob = self.repository[blob_id]
+                data = self.deserialize(blob.data)
+                Definition = Vertex.definition(vertex_name)
                 yield Definition(**data)
 
     def commit(self, query=None):

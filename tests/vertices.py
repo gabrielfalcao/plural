@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from plural import IncomingVertex
+from plural import IndirectVertex
 from plural import OutgoingVertex
 from plural import codec
 
@@ -38,7 +39,8 @@ class CarSale(OutgoingVertex):
     }
 
 
-class CarDeal(OutgoingVertex):
+class CarDeal(IndirectVertex):
+    label, target = 'dealed_with', 'Person'
     indexes = {'delivered_at'}
     fields = {
         'delivered_at': codec.DateTime,

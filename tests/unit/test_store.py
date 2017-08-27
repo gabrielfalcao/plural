@@ -16,13 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pygit2 import GIT_FILEMODE_BLOB
-from mock import patch, call, MagicMock
+from mock import patch, call, MagicMock, ANY
 
 from plural.store import PluralStore
 from tests.edges import Car
 from tests.edges import Person
 from tests.vertices import CarPurchase
 from tests.vertices import CarSale
+from tests.vertices import CarDeal
 from .scenarios import with_graph_store
 
 
@@ -219,7 +220,7 @@ def test_create_edge(context, add_spo, git_object_hash):
 @patch('plural.store.pygit2.hash')
 @patch('plural.store.PluralStore.add_spo')
 def test_create_vertex_incoming(context, add_spo, git_object_hash):
-    ('PluralStore.create_vertex() should add spos for its indexes')
+    ('PluralStore.create_vertex() should add spos for incoming links')
 
     git_object_hash.return_value = 'git-object-hash'
     tesla = Car(uuid='car-uuid', brand='Tesla')
@@ -246,34 +247,63 @@ def test_create_vertex_incoming(context, add_spo, git_object_hash):
     ])
 
 
-# @with_graph_store('/path/to/folder')
-# @patch('plural.store.pygit2.hash')
-# @patch('plural.store.PluralStore.add_spo')
-# def test_create_vertex_outgoing(context, add_spo, git_object_hash):
-#     ('PluralStore.create_vertex() should add spos for its indexes')
+@with_graph_store('/path/to/folder')
+@patch('plural.store.pygit2.hash')
+@patch('plural.store.PluralStore.add_spo')
+def test_create_vertex_outgoing(context, add_spo, git_object_hash):
+    ('PluralStore.create_vertex() should add spos for outgoing links')
 
-#     git_object_hash.return_value = 'git-object-hash'
-#     tesla = Car(uuid='car-uuid', brand='Tesla')
-#     elon = Person(uuid='elon-uuid', name='Elon Musk')
+    git_object_hash.return_value = 'git-object-hash'
+    tesla = Car(uuid='car-uuid', brand='Tesla')
+    elon = Person(uuid='elon-uuid', name='Elon Musk')
 
-#     sale = context.store.create_vertex(
-#         CarSale,
-#         uuid='sales-uuid',
-#         origin=elon,
-#         target=tesla,
-#         contract_signed_at='2017-08-18 00:31:45',
-#         payment_received_at='2017-07-04 15:25:35',
-#     )
+    sale = context.store.create_vertex(
+        CarSale,
+        uuid='sale-uuid',
+        origin=elon,
+        target=tesla,
+        contract_signed_at='2017-08-18 00:31:45',
+        payment_received_at='2017-07-04 15:25:35',
+    )
+    sale.should.be.a(CarSale)
+    sale.to_dict().should.be.a(dict)
 
-#     sale.should.be.a(CarSale)
-#     sale.to_dict().should.be.a(dict)
+    add_spo.assert_has_calls([
+        call('CarSale/indexes/contract_signed_at', 'git-object-hash', '2017-08-18 00:31:45'),
+        call('CarSale/indexes/payment_received_at', 'git-object-hash', '2017-07-04 15:25:35'),
+        call('CarSale/indexes/uuid', 'git-object-hash', 'sale-uuid'),
+        call('CarSale/_ids', 'sale-uuid', 'git-object-hash'),
+        call('CarSale/_uuids', 'git-object-hash', 'sale-uuid'),
+        call('Car/outgoing/sold_by/Person', 'car-uuid', 'elon-uuid')
+    ])
 
-#     add_spo.assert_has_calls([
-#         call('Car/outgoing/sold_by/Person', 'uuid', 'elon-uuid'),
-#         call('CarSale/indexes/contract_signed_at', 'git-object-hash', 'contract-signed-at'),
-#         call('CarSale/indexes/payment_sent_at', 'git-object-hash', 'payment-sent-at'),
-#         call('CarSale/indexes/uuid', 'git-object-hash', 'sale-uuid'),
-#         call('CarSale/objects', 'git-object-hash', sale.to_json()),
-#         call('CarSale/_ids', 'sale-uuid', 'git-object-hash'),
-#         call('CarSale/_uuids', 'git-object-hash', 'sale-uuid')
-#     ])
+
+@with_graph_store('/path/to/folder')
+@patch('plural.store.pygit2.hash')
+@patch('plural.store.PluralStore.add_spo')
+def test_create_vertex_indirect(context, add_spo, git_object_hash):
+    ('PluralStore.create_vertex() should add spos for indirect links')
+
+    git_object_hash.return_value = 'git-object-hash'
+    chuck = Person(uuid='chuck-uuid', name='Chuck Norris')
+    elon = Person(uuid='elon-uuid', name='Elon Musk')
+
+    deal = context.store.create_vertex(
+        CarDeal,
+        uuid='deal-uuid',
+        origin=elon,
+        target=chuck,
+        delivered_at='2017-07-04 15:25:35',
+    )
+    deal.should.be.a(CarDeal)
+    deal.to_dict().should.be.a(dict)
+
+    add_spo.assert_has_calls([
+        call('CarDeal/indexes/delivered_at', 'git-object-hash', '2017-07-04 15:25:35'),
+        call('CarDeal/indexes/uuid', 'git-object-hash', 'deal-uuid'),
+        call('CarDeal/_ids', 'deal-uuid', 'git-object-hash'),
+        call('CarDeal/_uuids', 'git-object-hash', 'deal-uuid'),
+        # call('CarDeal/objects', 'git-object-hash', ANY),
+        call('Person/indirect/dealed_with/Person', 'chuck-uuid', 'elon-uuid'),
+        call('Person/indirect/dealed_with/Person', 'elon-uuid', 'chuck-uuid'),
+    ])
