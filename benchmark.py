@@ -41,4 +41,4 @@ def run_benchmark(item_count, commit_every_create=False):
     store.commit()
 
 
-run_benchmark(10000, commit_every_creat=False)
+run_benchmark(10000, commit_every_create=False)
