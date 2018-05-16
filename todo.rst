@@ -14,3 +14,4 @@ TODO:
 - Merge strategies *(git flow?)*
 - Use git-hooks for real time notifications
 - Allow arguments in codecs, i.e.: ``codec.DateTime(utc=True, _now=True)``
+- https://queue.acm.org/detail.cfm?id=3220266
