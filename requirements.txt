@@ -1,6 +1,6 @@
 agentzero==0.3.3
 coloredlogs==7.1
-gevent==1.2.2
+gevent==23.9.1
 mock==2.0.0
 plant==0.1.2
 pygit2==0.26.0
